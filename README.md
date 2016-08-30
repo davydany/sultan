@@ -82,3 +82,9 @@ Installed:
 Complete!
 
 ```
+
+## Advanced Usage 
+
+```
+@TODO: add advanced usage documentation
+```
