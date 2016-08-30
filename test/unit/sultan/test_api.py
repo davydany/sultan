@@ -4,10 +4,6 @@ from sultan import api
 
 class TestSultan(unittest.TestCase):
 
-    def setUp(self):
-
-        sultan = api.Sultan()
-
     def test_command_joins(self):
 
         sultan = api.Sultan()
@@ -34,3 +30,17 @@ class TestSultan(unittest.TestCase):
 
         sultan = api.Sultan()
         self.assertEqual(str(sultan.touch("/tmp/foo").and_().touch("/tmp/bar")), "touch /tmp/foo && touch /tmp/bar;")
+
+class TestSultanCommand(unittest.TestCase):
+
+    def test_normal(self):
+
+        sultan = api.Sultan()
+        command = api.Command(sultan, "yum")
+        self.assertEqual(str(command), "yum")
+
+    def test_where_attribute(self):
+
+        sultan = api.Sultan()
+        command = api.Command(sultan, "df")
+        self.assertEqual(str(command(where="/bin")), "/bin/df;")

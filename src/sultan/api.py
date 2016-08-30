@@ -1,3 +1,4 @@
+import os
 import subprocess
 import traceback
 
@@ -116,7 +117,7 @@ class Command(Base):
             if not os.path.exists(cmd):
                 raise IOError("Command '%s' does not exist in '%s'." % (cmd, where))
 
-            self.command = os.path.join(where, kwargs)
+            self.command = os.path.join(where, cmd)
 
         if len(kwargs) == 0 and len(args) == 1 and type(args[0]) == str:
             self.args = args[0].split(" ")
