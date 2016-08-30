@@ -1,4 +1,9 @@
+import subprocess
+import traceback
+
 from .core import Base
+from .conf import Settings
+from .echo import Echo
 
 def shell_decorator(name):
 
@@ -8,13 +13,39 @@ class Sultan(Base):
 
     commands = []
 
+    def __init__(self):
+
+        self.echo = Echo()
+        self.settings = Settings()
+
+    def __call__(self):
+
+        if self.commands:
+
+            # run commands
+            self.run()
+
+            # clear the commands buffer
+            self.clear()
+
     def __getattr__(self, name):
 
         return Command(self, name)
 
-    def __shell_call(self, name, *args, **kwargs):
+    def run(self):
 
-        return { "args": args, "kwargs": kwargs }
+        commands = str(self)
+        self.echo.echo(commands)
+        try:
+            response = subprocess.check_output(commands, shell=True)
+            self.echo.echo(response)
+            return response
+        except Exception, e:
+            
+            self.echo.echo_error("Unable to run '%s'" % commands)
+            self.echo.echo_error(traceback.format_exc())
+            if self.settings.HALT_ON_ERROR:
+                raise
 
     def add(self, command):
 
@@ -27,7 +58,7 @@ class Sultan(Base):
 
     def __str__(self):
 
-        return " ".join([str(c) for c in self.commands])
+        return "; ".join([str(c) for c in self.commands]) + ";"
 
 class Command(Base):
 
