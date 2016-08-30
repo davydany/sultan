@@ -15,6 +15,7 @@ class Sultan(Base):
 
     def __init__(self):
 
+        self.commands = []
         self.__echo = Echo()
         self.settings = Settings()
 
@@ -58,11 +59,39 @@ class Sultan(Base):
 
     def __str__(self):
 
-        return "; ".join([str(c) for c in self.commands]) + ";"
+        SPECIAL_CASES = (Pipe, And, )
+        output = ""
+        for i, cmd in enumerate(self.commands):
+
+            if (i == 0):
+                separator = ""
+            else:
+                if type(cmd) in SPECIAL_CASES:
+                    separator = " "
+                else:
+                    if type(self.commands[i-1]) in SPECIAL_CASES:
+                        separator = " "
+                    else:
+                        separator = "; "
+
+            cmd_str = str(cmd)
+            output += separator + cmd_str
+            
+        return output.strip() + ";"
 
     def spit(self):
 
         self.__echo.log(str(self))
+
+    def pipe(self):
+
+        self.add(Pipe(self, '|'))
+        return self
+
+    def and_(self):
+
+        self.add(And(self, "&&"))
+        return self
 
 class Command(Base):
 
@@ -123,7 +152,17 @@ class Pipe(Command):
 
     def __call__(self):
 
-        self.command = "|"
+        pass # do nothing
 
     def __str__(self):
-        return "|"
+        return self.command
+
+class And(Command):
+
+    def __call__(self):
+
+        pass # do nothing
+
+    def __str__(self):
+
+        return self.command
