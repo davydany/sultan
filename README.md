@@ -13,7 +13,7 @@
 Sultan is an interface to Bash from Python. Shell commands get to the point of 
 what you want them to do. For example, 
 
-![Sultan Logo](https://raw.githubusercontent.com/aeroxis/sultan/master/img/sultan-logo.png)
+<img src="https://raw.githubusercontent.com/aeroxis/sultan/master/img/sultan-logo.png" alt="sultan logo" style="width:256px; float:right;" />
 
 ```bash
 sudo yum install tree
