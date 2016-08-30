@@ -167,3 +167,22 @@ class And(Command):
     def __str__(self):
 
         return self.command
+
+class Redirect(Command):
+
+    def __call__(self, to_file, append=False, stdout=False, stderr=False):
+        print to_file
+
+        descriptor = None
+        if stdout and stderr:
+            descriptor = "&"
+        else:
+            if stdout and not stderr:
+                descriptor = "1"
+            elif stderr and not stdout:
+                descriptor = "2"
+            else:
+                raise ValueError("You chose redirect to stdout and stderr to be false. This is not valid.")
+        
+        descriptor = descriptor + ">" + (">" if append else "")
+        self.command = "%s %s" % (descriptor, to_file)
