@@ -23,6 +23,11 @@ class TestSultan(unittest.TestCase):
         self.assertEqual(str(self.sultan.yum("install -y gcc")), "yum install -y gcc;")
         self.sultan.clear()
 
+    def test_foo(self):
+
+        self.sultan.clear()
+        self.sultan.foo("test").spit()
+
     def test_execution(self):
 
         self.sultan.clear()
