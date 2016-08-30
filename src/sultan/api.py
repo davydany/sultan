@@ -77,6 +77,18 @@ class Command(Base):
 
     def __call__(self, *args, **kwargs):
 
+        # check for 'where' in kwargs
+        if 'where' in kwargs:
+            where = kwargs.pop('where')
+            if not os.path.exists(where):
+                raise IOError("The value for 'where' (%s), for '%s' does not exist." % (where, self.command))
+            
+            cmd = os.path.join(where, self.command)
+            if not os.path.exists(cmd):
+                raise IOError("Command '%s' does not exist in '%s'." % (cmd, where))
+
+            self.command = os.path.join(where, kwargs)
+
         if len(kwargs) == 0 and len(args) == 1 and type(args[0]) == str:
             self.args = args[0].split(" ")
             self.sultan.add(self)
