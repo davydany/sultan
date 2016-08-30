@@ -15,7 +15,7 @@ class Sultan(Base):
 
     def __init__(self):
 
-        self.echo = Echo()
+        self.__echo = Echo()
         self.settings = Settings()
 
     def __call__(self):
@@ -35,21 +35,21 @@ class Sultan(Base):
     def run(self):
 
         commands = str(self)
-        self.echo.echo(commands)
+        self.__echo.cmd(commands)
         try:
             response = subprocess.check_output(commands, shell=True)
-            self.echo.echo(response)
             return response
         except Exception, e:
             
-            self.echo.echo_error("Unable to run '%s'" % commands)
-            self.echo.echo_error(traceback.format_exc())
+            self.__echo.error("Unable to run '%s'" % commands)
+            self.__echo.error(traceback.format_exc())
             if self.settings.HALT_ON_ERROR:
                 raise
 
     def add(self, command):
 
         self.commands.append(command)
+        return self
 
     def clear(self):
 
@@ -59,6 +59,10 @@ class Sultan(Base):
     def __str__(self):
 
         return "; ".join([str(c) for c in self.commands]) + ";"
+
+    def spit(self):
+
+        self.__echo.log(str(self))
 
 class Command(Base):
 
@@ -72,6 +76,18 @@ class Command(Base):
         self.command = name
 
     def __call__(self, *args, **kwargs):
+
+        # check for 'where' in kwargs
+        if 'where' in kwargs:
+            where = kwargs.pop('where')
+            if not os.path.exists(where):
+                raise IOError("The value for 'where' (%s), for '%s' does not exist." % (where, self.command))
+            
+            cmd = os.path.join(where, self.command)
+            if not os.path.exists(cmd):
+                raise IOError("Command '%s' does not exist in '%s'." % (cmd, where))
+
+            self.command = os.path.join(where, kwargs)
 
         if len(kwargs) == 0 and len(args) == 1 and type(args[0]) == str:
             self.args = args[0].split(" ")
