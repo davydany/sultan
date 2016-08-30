@@ -2,6 +2,16 @@
 
 **Command and Rule over your Shell**
 
+[![Build Status](https://travis-ci.org/aeroxis/sultan.svg?branch=master)](https://travis-ci.org/aeroxis/sultan)
+
+## Versions:
+
+Sultan supports the following Python versions:
+
+```
+2.7.x
+```
+
 ## What is Sultan?
 Sultan is an interface to Bash from Python. Shell commands get to the point of 
 what you want them to do. For example, 
