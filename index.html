@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>Sultan by aeroxis</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">Sultan</h1>
+      <h2 class="project-tagline">Command and Rule over your Shell</h2>
+      <a href="https://github.com/aeroxis/sultan" class="btn">View on GitHub</a>
+      <a href="https://github.com/aeroxis/sultan/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/aeroxis/sultan/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <h1>
+<a id="sultan" class="anchor" href="#sultan" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Sultan</h1>
+
+<p><strong>Command and Rule over your Shell</strong></p>
+
+<p><a href="https://travis-ci.org/aeroxis/sultan"><img src="https://travis-ci.org/aeroxis/sultan.svg?branch=master" alt="Build Status"></a></p>
+
+<h2>
+<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Installation</h2>
+
+<p>Sultan is hosted on PyPi, so you can easily access it using <code>pip</code>.</p>
+
+<pre><code>pip install -U sultan
+</code></pre>
+
+<h2>
+<a id="versions" class="anchor" href="#versions" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Versions:</h2>
+
+<p>Sultan supports the following Python versions:</p>
+
+<pre><code>2.7.x
+</code></pre>
+
+<h2>
+<a id="what-is-sultan" class="anchor" href="#what-is-sultan" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>What is Sultan?</h2>
+
+<p>Sultan is an interface to Bash from Python. Shell commands get to the point of 
+what you want them to do. For example, </p>
+
+<div class="highlight highlight-source-shell"><pre>sudo yum install tree</pre></div>
+
+<p>would install <code>tree</code> on your local machine. However, we normally access command 
+line utilities like <code>yum</code>, via bash, and Bash is just not as nice as Python. 
+Python's beautiful syntax make code readable and easy to maintain far more than
+Bash.</p>
+
+<p>Bash is great for small scripts, but when we get complex scripts, Bash just 
+gets very tough to use. This is why Sultan was created.</p>
+
+<h1>
+<a id="basic-usage" class="anchor" href="#basic-usage" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Basic Usage</h1>
+
+<p>Sultan allows you to run bash commands from inside Python using simple function 
+calls. Here is a quick example to install tree via Sultan.</p>
+
+<div class="highlight highlight-source-python"><pre><span class="pl-k">from</span> sultan.api <span class="pl-k">import</span> Sultan
+
+<span class="pl-k">def</span> <span class="pl-en">install_tree</span>():
+    s <span class="pl-k">=</span> Sultan()
+    s.sudo(<span class="pl-s"><span class="pl-pds">"</span>yum install -y tree<span class="pl-pds">"</span></span>).run()</pre></div>
+
+<p>Here is the output:</p>
+
+<div class="highlight highlight-source-shell"><pre>sudo yum install -y tree<span class="pl-k">;</span>
+Loaded plugins: fastestmirror, langpacks
+Loading mirror speeds from cached hostfile
+ <span class="pl-k">*</span> epel: ca.mirror.babylon.network
+ <span class="pl-k">*</span> nux-dextop: mirror.li.nux.ro
+Resolving Dependencies
+--<span class="pl-k">&gt;</span> Running transaction check
+---<span class="pl-k">&gt;</span> Package tree.x86_64 0:1.6.0-10.el7 will be installed
+--<span class="pl-k">&gt;</span> Finished Dependency Resolution
+
+Dependencies Resolved
+
+================================================================================
+ Package      Arch           Version                Repository             Size
+================================================================================
+Installing:
+ tree         x86_64         1.6.0-10.el7           CentOS-7-Base          46 k
+
+Transaction Summary
+================================================================================
+Install  1 Package
+
+Total download size: 46 k
+Installed size: 87 k
+Downloading packages:
+Running transaction check
+Running transaction <span class="pl-c1">test</span>
+Transaction <span class="pl-c1">test</span> succeeded
+Running transaction
+  Installing <span class="pl-c1">:</span> tree-1.6.0-10.el7.x86_64                                     1/1 
+  Verifying  <span class="pl-c1">:</span> tree-1.6.0-10.el7.x86_64                                     1/1 
+
+Installed:
+  tree.x86_64 0:1.6.0-10.el7                                                    
+
+Complete<span class="pl-k">!</span>
+</pre></div>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/aeroxis/sultan">Sultan</a> is maintained by <a href="https://github.com/aeroxis">aeroxis</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  
+  </body>
+</html>
