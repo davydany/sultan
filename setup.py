@@ -2,8 +2,8 @@ from setuptools import setup, find_packages
 
 setup(
     name='sultan',
-    description='Rule Bash like a Sultan',
-    version='0.1',
+    description='Command and Rule over your Shell',
+    version='0.1.1',
     author='David Daniel',
     author_email='davydany@aeroxis.com',
     license='MIT',
