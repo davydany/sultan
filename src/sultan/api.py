@@ -32,7 +32,10 @@ class Sultan(Base):
 
     def __getattr__(self, name):
 
-        return Command(self, name)
+        if name == "redirect":
+            return Redirect(self, name)
+        else:
+            return Command(self, name)
 
     def run(self):
 
@@ -40,6 +43,11 @@ class Sultan(Base):
         self.__echo.cmd(commands)
         try:
             response = subprocess.check_output(commands, shell=True)
+            if response:
+                response = response.strip().split("\n")
+                if len(response) == 1:
+                    response = response[0]
+            self.clear()
             return response
         except Exception, e:
             
@@ -60,7 +68,7 @@ class Sultan(Base):
 
     def __str__(self):
 
-        SPECIAL_CASES = (Pipe, And, )
+        SPECIAL_CASES = (Pipe, And, Redirect)
         output = ""
         for i, cmd in enumerate(self.commands):
 
@@ -94,7 +102,8 @@ class Sultan(Base):
         self.add(And(self, "&&"))
         return self
 
-class Command(Base):
+    
+class BaseCommand(Base):
 
     command = None
     args = []
@@ -104,6 +113,8 @@ class Command(Base):
 
         self.sultan = sultan
         self.command = name
+
+class Command(BaseCommand):
 
     def __call__(self, *args, **kwargs):
 
@@ -118,14 +129,14 @@ class Command(Base):
                 raise IOError("Command '%s' does not exist in '%s'." % (cmd, where))
 
             self.command = os.path.join(where, cmd)
+        
+        if "sudo" in kwargs:
+            sudo = kwargs.pop("sudo")
+            self.command = "sudo " + self.command
 
-        if len(kwargs) == 0 and len(args) == 1 and type(args[0]) == str:
-            self.args = args[0].split(" ")
-            self.sultan.add(self)
-        else:
-            self.args = args
-            self.kwargs = kwargs
-            self.sultan.add(self)
+        self.args = args
+        self.kwargs = kwargs
+        self.sultan.add(self)
         return self.sultan
 
     def __str__(self):
@@ -147,18 +158,20 @@ class Command(Base):
         output = self.command
         if len(kwargs_str) > 0: output = output + " " + kwargs_str
         if len(args_str) > 0: output = output + " " + args_str
+        
         return output
 
-class Pipe(Command):
+class Pipe(BaseCommand):
 
     def __call__(self):
 
         pass # do nothing
 
     def __str__(self):
+        
         return self.command
 
-class And(Command):
+class And(BaseCommand):
 
     def __call__(self):
 
@@ -168,11 +181,10 @@ class And(Command):
 
         return self.command
 
-class Redirect(Command):
+class Redirect(BaseCommand):
 
     def __call__(self, to_file, append=False, stdout=False, stderr=False):
-        print to_file
-
+        
         descriptor = None
         if stdout and stderr:
             descriptor = "&"
@@ -186,3 +198,9 @@ class Redirect(Command):
         
         descriptor = descriptor + ">" + (">" if append else "")
         self.command = "%s %s" % (descriptor, to_file)
+        self.sultan.add(self)
+        return self.sultan
+
+    def __str__(self):
+
+        return self.command
