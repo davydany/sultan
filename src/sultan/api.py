@@ -4,6 +4,7 @@ import traceback
 
 from .core import Base
 from .conf import Settings
+from .err import InvalidContextError
 from .echo import Echo
 
 def shell_decorator(name):
@@ -12,14 +13,52 @@ def shell_decorator(name):
 
 class Sultan(Base):
 
-    commands = []
+    commands = None
+    _context = None
+    
+    @classmethod
+    def load(cls, cwd=None, **kwargs):
 
-    def __init__(self):
+        context = {}
+        context['cwd'] = cwd
+        context.update(kwargs)
+        s = Sultan(context=context)
+        return s
+
+    def __init__(self, context=None):
 
         self.commands = []
         self.__echo = Echo()
         self.settings = Settings()
 
+        if context:
+            if self._context:
+                self._context.append(context)
+            else:
+                self._context = [context]
+        else:
+            self._context = []
+
+    @property
+    def current_context(self):
+        """
+        Returns the context that Sultan is running on
+        """
+        return self._context[-1] if len(self._context) > 0 else {}
+        
+    def __enter__(self):
+
+        # do nothing since we got 'current_context' and '_context' are doing the work
+        # however, we do want to alert the user that they're using contexts badly.
+        if len(self._context) == 0:
+            raise InvalidContextError("You're using the 'with' block to load Sultan, but didn't provide a context with 'Sultan.context(...)'")
+        return self
+
+    def __exit__(self, type, value, traceback):
+
+        if len(self._context) > 0:
+            self._context.pop()
+        
     def __call__(self):
 
         if self.commands:
@@ -68,6 +107,7 @@ class Sultan(Base):
 
     def __str__(self):
 
+        context = self.current_context
         SPECIAL_CASES = (Pipe, And, Redirect)
         output = ""
         for i, cmd in enumerate(self.commands):
@@ -86,7 +126,15 @@ class Sultan(Base):
             cmd_str = str(cmd)
             output += separator + cmd_str
             
-        return output.strip() + ";"
+        output = output.strip() + ";"
+
+        # update with 'cwd' context
+        cwd = context.get('cwd')
+        if cwd:
+            prepend = "cd %s && " % (cwd)
+            output = prepend + output
+        
+        return output
 
     def spit(self):
 
@@ -106,13 +154,17 @@ class Sultan(Base):
 class BaseCommand(Base):
 
     command = None
-    args = []
-    kwargs = {}
+    args = None
+    kwargs = None
+    context = None
 
-    def __init__(self, sultan, name):
+    def __init__(self, sultan, name, context=None):
 
         self.sultan = sultan
         self.command = name
+        self.args = []
+        self.kwargs = {}
+        self.context = context if context else {}
 
 class Command(BaseCommand):
 
