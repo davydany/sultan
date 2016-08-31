@@ -104,8 +104,61 @@ Complete<span class="pl-k">!</span>
 <h2>
 <a id="advanced-usage" class="anchor" href="#advanced-usage" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Advanced Usage</h2>
 
-<pre><code>@TODO: add advanced usage documentation
-</code></pre>
+<p>The following are advanced usage of Sultan:</p>
+
+<h3>
+<a id="pipe" class="anchor" href="#pipe" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Pipe</h3>
+
+<p>In bash, we'd like to pipe multiple commands to take the output of the first
+command and send it to the second command. For example, suppose we want to 
+find all the files that contain the word <code>Sultan</code> in a bunch of files in a 
+given directory. We would do this:</p>
+
+<div class="highlight highlight-source-shell"><pre>find <span class="pl-k">~</span>/projects/sultan -name <span class="pl-s"><span class="pl-pds">"</span>*.py<span class="pl-pds">"</span></span> <span class="pl-k">|</span> xargs grep <span class="pl-s"><span class="pl-pds">"</span>Sultan<span class="pl-pds">"</span></span></pre></div>
+
+<p>We would do the following with Sultan:</p>
+
+<div class="highlight highlight-source-python"><pre>s <span class="pl-k">=</span> Sultan()
+response <span class="pl-k">=</span> s.find(<span class="pl-s"><span class="pl-pds">"</span>~/projects/sultan -name '*.py'<span class="pl-pds">"</span></span>).pipe().grep(<span class="pl-s"><span class="pl-pds">"</span>Sultan<span class="pl-pds">"</span></span>).run()</pre></div>
+
+<h3>
+<a id="and" class="anchor" href="#and" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>And</h3>
+
+<p>In bash, we'd like to run two commands together, like changing to a directory 
+and running a command there, like:</p>
+
+<div class="highlight highlight-source-shell"><pre><span class="pl-c1">cd</span> /tmp/ <span class="pl-k">&amp;&amp;</span> ls -lah</pre></div>
+
+<p>We would do the following with Sultan:</p>
+
+<div class="highlight highlight-source-python"><pre>s <span class="pl-k">=</span> Sultan()
+response <span class="pl-k">=</span> s.cd(<span class="pl-s"><span class="pl-pds">"</span>/tmp<span class="pl-pds">"</span></span>).and_().ls(<span class="pl-s"><span class="pl-pds">"</span>-lah<span class="pl-pds">"</span></span>)</pre></div>
+
+<h3>
+<a id="redirect" class="anchor" href="#redirect" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Redirect</h3>
+
+<p>In bash, something we do a lot is redirect output (<code>stdout</code>, <code>stderr</code>) into a 
+file. We would do it like this:</p>
+
+<div class="highlight highlight-source-shell"><pre>find / -type d <span class="pl-k">&gt;</span> /tmp/contents</pre></div>
+
+<p>We would do the following with Sultan:</p>
+
+<div class="highlight highlight-source-python"><pre>s <span class="pl-k">=</span> Sultan()
+response <span class="pl-k">=</span> s.find(<span class="pl-s"><span class="pl-pds">"</span>/ -type d<span class="pl-pds">"</span></span>).redirect(<span class="pl-s"><span class="pl-pds">"</span>/tmp/contents<span class="pl-pds">"</span></span>, <span class="pl-v">stdout</span><span class="pl-k">=</span><span class="pl-c1">True</span>)</pre></div>
+
+<h3>
+<a id="custom-commands" class="anchor" href="#custom-commands" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Custom commands</h3>
+
+<p>Sultan still needs a lot of work and we understand that. We encourage you to 
+create bug reports and feature requests on the Github page at: 
+<a href="https://github.com/aeroxis/sultan/issues">https://github.com/aeroxis/sultan/issues</a></p>
+
+<p>That being said, if you want to do something custom, run:</p>
+
+<div class="highlight highlight-source-python"><pre>s <span class="pl-k">=</span> Sultan()
+s.command <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>yum install -y gcc<span class="pl-pds">"</span></span>
+response <span class="pl-k">=</span> s.run()</pre></div>
 
       <footer class="site-footer">
         <span class="site-footer-owner"><a href="https://github.com/aeroxis/sultan">Sultan</a> is maintained by <a href="https://github.com/aeroxis">aeroxis</a>.</span>
