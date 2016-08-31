@@ -102,13 +102,20 @@ class SultanTestCase(unittest.TestCase):
 
             self.assertEqual(str(sultan.ls('-lah')), 'cd /tmp && ls -lah;')
 
-    # def test_calling_context_wrongly(self):
+    def test_calling_context_wrongly(self):
 
-    #     s = Sultan()
-    #     with self.assertRaises(InvalidContextError):
-    #         with Sultan() as s:
-    #             pass
+        s = Sultan()
+        with self.assertRaises(InvalidContextError):
+            with Sultan() as s:
+                pass
 
+    def test_clear_buffer_on_error(self):
+
+        s = Sultan()
+        try:
+            s.ls("/root").run()
+        except:
+            self.assertEqual(len(s.commands), 0)
 
             
 

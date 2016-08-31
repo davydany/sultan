@@ -86,7 +86,6 @@ class Sultan(Base):
                 response = response.strip().split("\n")
                 if len(response) == 1:
                     response = response[0]
-            self.clear()
             return response
         except Exception, e:
             
@@ -94,6 +93,10 @@ class Sultan(Base):
             self.__echo.error(traceback.format_exc())
             if self.settings.HALT_ON_ERROR:
                 raise
+        finally:
+            
+            # clear the buffer
+            self.clear()
 
     def add(self, command):
 
