@@ -1,0 +1,3 @@
+class InvalidContextError(Exception):
+
+    pass

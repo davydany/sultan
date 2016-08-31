@@ -5,6 +5,7 @@ import unittest
 from sultan.api import And, Command, Pipe, Redirect, Sultan
 from sultan.conf import Settings
 from sultan.echo import Echo
+from sultan.err import InvalidContextError
 
 
 class SultanTestCase(unittest.TestCase):
@@ -85,6 +86,31 @@ class SultanTestCase(unittest.TestCase):
 
         sultan = Sultan()
         self.assertEqual(str(sultan.touch("/tmp/foo").and_().touch("/tmp/bar")), "touch /tmp/foo && touch /tmp/bar;")
+
+    def test_calling_context(self):
+
+        sultan = Sultan.load(cwd='/tmp', test_key='test_val')
+        self.assertEqual(sultan.current_context, { 'cwd': '/tmp', 'test_key': 'test_val' })
+
+        with Sultan.load(cwd='/tmp') as sultan:
+
+            self.assertEqual(sultan.current_context, { 'cwd': '/tmp' })
+
+    def test_context_for_pwd(self):
+
+        with Sultan.load(cwd='/tmp') as sultan:
+
+            self.assertEqual(str(sultan.ls('-lah')), 'cd /tmp && ls -lah;')
+
+    # def test_calling_context_wrongly(self):
+
+    #     s = Sultan()
+    #     with self.assertRaises(InvalidContextError):
+    #         with Sultan() as s:
+    #             pass
+
+
+            
 
 class SultanCommandTestCase(unittest.TestCase):
 
