@@ -84,6 +84,68 @@ Complete!
 
 ## Advanced Usage 
 
+The following are advanced usage of Sultan:
+
+### Pipe
+
+In bash, we'd like to pipe multiple commands to take the output of the first
+command and send it to the second command. For example, suppose we want to 
+find all the files that contain the word `Sultan` in a bunch of files in a 
+given directory. We would do this:
+
+```bash
+find ~/projects/sultan -name "*.py" | xargs grep "Sultan"
 ```
-@TODO: add advanced usage documentation
+
+We would do the following with Sultan:
+
+```python
+s = Sultan()
+response = s.find("~/projects/sultan -name '*.py'").pipe().grep("Sultan").run()
+```
+
+### And
+
+In bash, we'd like to run two commands together, like changing to a directory 
+and running a command there, like:
+
+```bash
+cd /tmp/ && ls -lah
+``` 
+
+We would do the following with Sultan:
+
+```python
+s = Sultan()
+response = s.cd("/tmp").and_().ls("-lah")
+```
+
+### Redirect
+
+In bash, something we do a lot is redirect output (`stdout`, `stderr`) into a 
+file. We would do it like this:
+
+```bash
+find / -type d > /tmp/contents
+```
+
+We would do the following with Sultan:
+
+```python
+s = Sultan()
+response = s.find("/ -type d").redirect("/tmp/contents", stdout=True)
+```
+
+### Custom commands
+
+Sultan still needs a lot of work and we understand that. We encourage you to 
+create bug reports and feature requests on the Github page at: 
+[https://github.com/aeroxis/sultan/issues](https://github.com/aeroxis/sultan/issues)
+
+That being said, if you want to do something custom, run:
+
+```python
+s = Sultan()
+s.command = "yum install -y gcc"
+response = s.run()
 ```
