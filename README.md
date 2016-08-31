@@ -4,17 +4,16 @@
 
 [![Build Status](https://travis-ci.org/aeroxis/sultan.svg?branch=master)](https://travis-ci.org/aeroxis/sultan)
 
-## Versions:
+**NOTE 1:** Sultan only supports Python `2.7.x`.
 
-Sultan supports the following Python versions:
-
-```
-2.7.x
-```
+**NOTE 2:** Your input is welcome! Please provide your feedback by creating 
+[issues on Github](https://github.com/aeroxis/sultan/issues).
 
 ## What is Sultan?
 Sultan is an interface to Bash from Python. Shell commands get to the point of 
 what you want them to do. For example, 
+
+<img src="https://raw.githubusercontent.com/aeroxis/sultan/master/img/sultan-logo.png" alt="sultan logo" style="width:256px; float:right;" />
 
 ```bash
 sudo yum install tree
