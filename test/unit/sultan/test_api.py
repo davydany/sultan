@@ -29,7 +29,7 @@ class SultanTestCase(unittest.TestCase):
         sultan = Sultan()
         response = sultan.ls("-lah /tmp").run()
         self.assertTrue(m_subprocess.check_output.called)
-        self.assertEqual(response, "sample_response")
+        self.assertEqual(response, ["sample_response"])
 
     def test_run_advanced(self):
 
@@ -80,7 +80,7 @@ class SultanTestCase(unittest.TestCase):
         sultan = Sultan()
         sultan.touch("/tmp/foo").run()
         response = sultan.ls("-1 /tmp/foo").run()
-        self.assertEqual(response, "/tmp/foo")
+        self.assertEqual(response, ["/tmp/foo"])
 
     def test_and(self):
 

@@ -4,7 +4,8 @@
 
 **Command and Rule over your Shell**
 
-[![PyPI Version](https://badge.fury.io/py/sultan.svg)](https://badge.fury.io/py/sultan)[![Travis Build Status] (https://travis-ci.org/aeroxis/sultan.svg?branch=master)](https://travis-ci.org/aeroxis/sultan)
+[![PyPI Version](https://badge.fury.io/py/sultan.svg)](https://badge.fury.io/py/sultan) [![Travis Build Status] (https://travis-ci.org/aeroxis/sultan.svg?branch=master)](https://travis-ci.org/aeroxis/sultan) [![License](http://img.shields.io/:license-mit-blue.svg)](http://doge.mit-license.org)
+
 
 **NOTE 1:** Sultan only supports Python `2.7.x`.
 
