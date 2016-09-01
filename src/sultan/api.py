@@ -84,7 +84,10 @@ class Sultan(Base):
         except Exception, e:
             
             self.__echo.error("Unable to run '%s'" % commands)
-            self.__echo.error(traceback.format_exc())
+            tb = traceback.format_exc().split("\n")
+            for l in tb:
+                self.__echo.critical("    %s" % l)
+            self.__echo.error()
             if self.settings.HALT_ON_ERROR:
                 raise
         finally:

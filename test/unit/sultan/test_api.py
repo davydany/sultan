@@ -35,10 +35,11 @@ class SultanTestCase(unittest.TestCase):
 
         sultan = Sultan()
         try:
-            sultan.mkdir("-p /tmp/mytestdir").run()
-            sultan.mkdir("-p /tmp/mytestdir/foobar").run()
-            sultan.touch("/tmp/mytestdir/a").run()
-            sultan.touch("/tmp/mytestdir/b").run()
+            sultan.mkdir("-p /tmp/mytestdir")\
+                .mkdir("-p /tmp/mytestdir/foobar")\
+                .touch("/tmp/mytestdir/a")\
+                .touch("/tmp/mytestdir/b")\
+                .run()
             
             response = sultan.ls("-1 /tmp/mytestdir/").run()
             self.assertEqual( response, ['a', 'b', 'foobar'])
