@@ -7,9 +7,6 @@ from .conf import Settings
 from .err import InvalidContextError
 from .echo import Echo
 
-def shell_decorator(name):
-
-    pass
 
 class Sultan(Base):
 
@@ -81,16 +78,16 @@ class Sultan(Base):
         commands = str(self)
         self.__echo.cmd(commands)
         try:
-            response = subprocess.check_output(commands, shell=True)
-            if response:
-                response = response.strip().split("\n")
-                if len(response) == 1:
-                    response = response[0]
+            stdout = subprocess.check_output(commands, shell=True)
+            response = stdout.strip().split("\n") if stdout else stdout
             return response
         except Exception, e:
             
             self.__echo.error("Unable to run '%s'" % commands)
-            self.__echo.error(traceback.format_exc())
+            tb = traceback.format_exc().split("\n")
+            for l in tb:
+                self.__echo.critical("    %s" % l)
+            self.__echo.error()
             if self.settings.HALT_ON_ERROR:
                 raise
         finally:
