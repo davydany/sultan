@@ -35,7 +35,7 @@ setup(
     name='sultan',
     description='Command and Rule over your Shell',
     long_description=LONG_DESCRIPTION,
-    version='0.1.8',
+    version='0.1.9',
     author='David Daniel',
     author_email='davydany@aeroxis.com',
     license='MIT',

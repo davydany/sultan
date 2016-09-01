@@ -9,6 +9,7 @@ handler.setFormatter(ColoredFormatter(
 
 logger = logging.getLogger('sultan')
 logger.addHandler(handler)
+logger.setLevel(logging.DEBUG)
 
 
 class Echo(Base):
