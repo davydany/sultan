@@ -4,48 +4,54 @@ from sultan.echo.colorlog import StreamHandler, ColoredFormatter
 
 handler = StreamHandler()
 handler.setFormatter(ColoredFormatter(
-    '%(log_color)s[sultan]  %(message)s'
+    '%(log_color)s[%(name)s]: %(message)s'
 ))
 
-logger = logging.getLogger('sultan')
-logger.addHandler(handler)
-logger.setLevel(logging.DEBUG)
 
+def getLogger(name='', level=logging.DEBUG):
+    logger = logging.getLogger(name)
+    logger.addHandler(handler)
+    logger.setLevel(level)
+    return logger
 
 class Echo(Base):
 
+    def __init__(self):
+
+        self.logger = getLogger(name='sultan')
+
     def log(self, msg):
 
-        logger.info(msg)
+        self.logger.info(msg)
 
     def cmd(self, msg):
 
-        logger.debug(msg)
+        self.logger.debug(msg)
 
     def stdout(self, msg):
 
-        logger.info(msg)
+        self.logger.info(msg)
 
     def stderr(self, msg):
 
-        logger.critical(msg)
+        self.logger.critical(msg)
 
     def debug(self, msg):
 
-        logger.debug(msg)
+        self.logger.debug(msg)
 
     def info(self, msg):
 
-        logger.info(msg)
+        self.logger.info(msg)
 
     def warn(self, msg):
 
-        logger.warning(msg)
+        self.logger.warning(msg)
 
     def error(self, msg):
 
-        logger.error(msg)
+        self.logger.error(msg)
 
     def critical(self, msg):
 
-        logger.critical(msg)
+        self.logger.critical(msg)
