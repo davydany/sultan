@@ -87,7 +87,6 @@ class Sultan(Base):
             tb = traceback.format_exc().split("\n")
             for l in tb:
                 self.__echo.critical("    %s" % l)
-            self.__echo.error()
             if self.settings.HALT_ON_ERROR:
                 raise
         finally:
@@ -186,7 +185,7 @@ class Command(BaseCommand):
             sudo = kwargs.pop("sudo")
             self.command = "sudo " + self.command
 
-        self.args = args
+        self.args = [str(a) for a in args]
         self.kwargs = kwargs
         self.sultan.add(self)
         return self.sultan
