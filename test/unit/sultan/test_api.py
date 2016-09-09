@@ -1,6 +1,7 @@
 import mock
 import os
 import shutil
+import subprocess
 import unittest
 from sultan.api import And, Command, Pipe, Redirect, Sultan
 from sultan.conf import Settings
@@ -46,6 +47,19 @@ class SultanTestCase(unittest.TestCase):
         finally:
             if os.path.exists('/tmp/mytestdir'):
                 shutil.rmtree('/tmp/mytestdir')
+
+    @mock.patch('sultan.api.subprocess')
+    def test_run_halt_on_nonzero(self, m_subprocess):
+
+        m_subprocess.check_output.side_effect = subprocess.CalledProcessError(1, "foobar")
+        s = Sultan()
+        with self.assertRaises(subprocess.CalledProcessError):
+            s.foobar("-qux").run()
+        
+        try:
+            s.foobar("-qux").run(halt_on_nonzero=False)
+        except Exception, e:
+            self.fail("s.foobar('-qux').run(halt_on_nonzero=False) should not raise any errors.")
 
 
     def test_basic_command_chains(self):

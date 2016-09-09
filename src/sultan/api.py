@@ -73,7 +73,7 @@ class Sultan(Base):
         else:
             return Command(self, name)
 
-    def run(self):
+    def run(self, halt_on_nonzero=True):
 
         commands = str(self)
         self.__echo.cmd(commands)
@@ -88,7 +88,8 @@ class Sultan(Base):
             for l in tb:
                 self.__echo.critical("    %s" % l)
             if self.settings.HALT_ON_ERROR:
-                raise
+                if halt_on_nonzero:
+                    raise
         finally:
             
             # clear the buffer
