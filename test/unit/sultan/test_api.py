@@ -195,3 +195,4 @@ class TestRedirect(unittest.TestCase):
         r = Redirect(s, '')
         r("/tmp/foo", stdout=True, stderr=True, append=True)
         self.assertEqual(r.command, "&>> /tmp/foo")
+        
