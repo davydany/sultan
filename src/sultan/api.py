@@ -1,3 +1,12 @@
+__doc__ = """
+# Sultan API
+
+Sultan provides a pythonic interface to bash. Run bash commands like you'd 
+normally run a python method, and Sultan will automatically use the 
+'subprocess' API to write your command, and return your results. 
+
+"""
+
 import os
 import subprocess
 import traceback
@@ -7,15 +16,18 @@ from .conf import Settings
 from .err import InvalidContextError
 from .echo import Echo
 
+__all__ = ['Sultan']
 
 class Sultan(Base):
-
+    """
+    The Pythonic interface to Bash.
+    """
     commands = None
     _context = None
     
     @classmethod
     def load(cls, cwd=None, **kwargs):
-
+        
         context = {}
         context['cwd'] = cwd
         context.update(kwargs)
@@ -44,7 +56,27 @@ class Sultan(Base):
         return self._context[-1] if len(self._context) > 0 else {}
         
     def __enter__(self):
+        """
+        Sultan can be used with context using `with` blocks, as such:
 
+        ```python
+
+        with Sultan.load(cwd="/tmp") as s:
+            s.ls("-lah").run()
+        ```
+
+        This is easier to manage than doing the following:
+
+        ```python
+        
+        s = Sultan()
+        s.cd("/tmp").and_().ls("-lah").run()
+        ```
+
+        There are one-off times when running `s.cd("/tmp").and_().ls("-lah").run()` works better. However, 
+        if you have multiple commands to run in a given directory, using Sultan with context, allows your
+        code to be easy to manage.
+        """
         # do nothing since we got 'current_context' and '_context' are doing the work
         # however, we do want to alert the user that they're using contexts badly.
         if len(self._context) == 0:
@@ -52,12 +84,14 @@ class Sultan(Base):
         return self
 
     def __exit__(self, type, value, traceback):
-
+        """
+        Restores the context to previous context.
+        """
         if len(self._context) > 0:
             self._context.pop()
         
     def __call__(self):
-
+        
         if self.commands:
 
             # run commands
@@ -74,7 +108,9 @@ class Sultan(Base):
             return Command(self, name)
 
     def run(self, halt_on_nonzero=True):
-
+        """
+        After building your commands, call `run()` to have your code executed.
+        """
         commands = str(self)
         self.__echo.cmd(commands)
         try:
@@ -95,8 +131,10 @@ class Sultan(Base):
             # clear the buffer
             self.clear()
 
-    def add(self, command):
-
+    def _add(self, command):
+        """
+        Private method that adds a custom command (see `pipe` and `and_`). 
+        """
         self.commands.append(command)
         return self
 
@@ -106,7 +144,9 @@ class Sultan(Base):
         return self
 
     def __str__(self):
-
+        """
+        Returns the chained commands that were built as a string.
+        """
         context = self.current_context
         SPECIAL_CASES = (Pipe, And, Redirect)
         output = ""
@@ -137,21 +177,44 @@ class Sultan(Base):
         return output
 
     def spit(self):
-
+        """
+        Logs to the logger the command.
+        """
         self.__echo.log(str(self))
 
     def pipe(self):
+        """
+        Pipe commands in Sultan.
 
-        self.add(Pipe(self, '|'))
+        Usage:
+
+        ```
+        s = Sultan()
+        s.cat("/var/log/foobar.log").pipe().grep("192.168.1.1").run()
+        ```
+        """
+        self._add(Pipe(self, '|'))
         return self
 
     def and_(self):
+        """
+        Combines multiple commands using `&&`.
 
-        self.add(And(self, "&&"))
+        Usage:
+
+        ```
+        s = Sultan()
+        s.cd("/tmp").and_().touch("foobar.txt").run()
+        ```
+        """
+        self._add(And(self, "&&"))
         return self
 
     
 class BaseCommand(Base):
+    """
+    The Base class for all commands.
+    """
 
     command = None
     args = None
@@ -167,7 +230,11 @@ class BaseCommand(Base):
         self.context = context if context else {}
 
 class Command(BaseCommand):
+    """
+    The class that all commands are based off. Essentially, when we run 
+    `Sultan().foo()`, `foo` is represented as an instance of `Command`.
 
+    """
     def __call__(self, *args, **kwargs):
 
         # check for 'where' in kwargs
@@ -214,7 +281,9 @@ class Command(BaseCommand):
         return output
 
 class Pipe(BaseCommand):
-
+    """
+    Representation of the Pipe `|` operator.
+    """
     def __call__(self):
 
         pass # do nothing
@@ -224,7 +293,9 @@ class Pipe(BaseCommand):
         return self.command
 
 class And(BaseCommand):
-
+    """
+    Representation of the And `&&` operator.
+    """
     def __call__(self):
 
         pass # do nothing
@@ -234,7 +305,9 @@ class And(BaseCommand):
         return self.command
 
 class Redirect(BaseCommand):
-
+    """
+    Representation of the Redirect (`>`, `>>`, ...) operator.
+    """
     def __call__(self, to_file, append=False, stdout=False, stderr=False):
         
         descriptor = None

@@ -1,0 +1,3 @@
+CommonMark==0.5.4
+docutils==0.12
+recommonmark==0.4.0
