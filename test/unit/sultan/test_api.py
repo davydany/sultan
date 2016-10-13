@@ -4,7 +4,7 @@ import shutil
 import subprocess
 import unittest
 from sultan.api import And, Command, Pipe, Redirect, Sultan
-from sultan.conf import Settings
+from sultan.config import Settings
 from sultan.echo import Echo
 from sultan.err import InvalidContextError
 
