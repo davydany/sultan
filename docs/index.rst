@@ -1,7 +1,14 @@
 
+.. image:: img/sultan-logo.png
+    :alt: Sultan logo
+    :align: right
+
 ======
 Sultan
 ======
+
+**Command and Rule over your Shell**
+
 
 .. automodule:: sultan.api
 
@@ -10,7 +17,6 @@ Sultan
     :name: mastertoc
     :maxdepth: 2
 
-    index
     install-sultan
     sultan-examples
 

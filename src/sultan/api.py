@@ -1,9 +1,4 @@
 __doc__ = """
-======
-Sultan
-======
-
-**Command and Rule over your Shell**
 
 Sultan is a Python package for interfacing with command-line utilities, like 
 `yum`, `apt-get`, or `ls`, in a Pythonic manner. It lets you run command-line 
