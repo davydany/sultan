@@ -108,3 +108,11 @@ ENV/
 pyvenv.cfg
 .venv
 pip-selfcheck.json
+
+### Sphinx ###
+_build
+_static
+_templates
+
+### VSCode ###
+.vscode

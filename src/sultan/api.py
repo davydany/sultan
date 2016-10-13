@@ -1,9 +1,37 @@
 __doc__ = """
-# Sultan API
+======
+Sultan
+======
 
-Sultan provides a pythonic interface to bash. Run bash commands like you'd 
-normally run a python method, and Sultan will automatically use the 
-'subprocess' API to write your command, and return your results. 
+**Command and Rule over your Shell**
+
+Sultan is a Python package for interfacing with command-line utilities, like 
+`yum`, `apt-get`, or `ls`, in a Pythonic manner. It lets you run command-line 
+utilities using simple function calls. 
+
+Here is how you'd use Sultan::
+
+    from sultan.api import Sultan
+
+    def install_tree():
+        '''
+        Install 'tree' package.
+        '''
+        s = Sultan()
+        s.sudo("yum install -y tree").run()
+
+Here is how to use Sultan with Context Management::
+
+    from sultan.api import Sultan
+
+    def echo_hosts():
+        '''
+        Echo the contents of `/etc/hosts`
+        '''
+        with Sultan.load(cwd="/etc") as s:
+            s.cat("hosts").run()
+
+That's it!
 
 """
 
@@ -65,13 +93,10 @@ class Sultan(Base):
             s.ls("-lah").run()
         ```
 
-        This is easier to manage than doing the following:
-
-        ```python
+        This is easier to manage than doing the following::
         
-        s = Sultan()
-        s.cd("/tmp").and_().ls("-lah").run()
-        ```
+            s = Sultan()
+            s.cd("/tmp").and_().ls("-lah").run()
 
         There are one-off times when running `s.cd("/tmp").and_().ls("-lah").run()` works better. However, 
         if you have multiple commands to run in a given directory, using Sultan with context, allows your
@@ -133,7 +158,9 @@ class Sultan(Base):
 
     def _add(self, command):
         """
-        Private method that adds a custom command (see `pipe` and `and_`). 
+        Private method that adds a custom command (see `pipe` and `and_`).
+        
+        NOT FOR PUBLIC USE 
         """
         self.commands.append(command)
         return self
@@ -186,12 +213,11 @@ class Sultan(Base):
         """
         Pipe commands in Sultan.
 
-        Usage:
+        Usage::
 
-        ```
-        s = Sultan()
-        s.cat("/var/log/foobar.log").pipe().grep("192.168.1.1").run()
-        ```
+            # runs: 'cat /var/log/foobar.log | grep 192.168.1.1'
+            s = Sultan()
+            s.cat("/var/log/foobar.log").pipe().grep("192.168.1.1").run()
         """
         self._add(Pipe(self, '|'))
         return self
@@ -200,12 +226,11 @@ class Sultan(Base):
         """
         Combines multiple commands using `&&`.
 
-        Usage:
+        Usage::
 
-        ```
-        s = Sultan()
-        s.cd("/tmp").and_().touch("foobar.txt").run()
-        ```
+            # runs: 'cd /tmp && touch foobar.txt'
+            s = Sultan()
+            s.cd("/tmp").and_().touch("foobar.txt").run()
         """
         self._add(And(self, "&&"))
         return self
@@ -255,7 +280,7 @@ class Command(BaseCommand):
 
         self.args = [str(a) for a in args]
         self.kwargs = kwargs
-        self.sultan.add(self)
+        self.sultan._add(self)
         return self.sultan
 
     def __str__(self):
@@ -323,7 +348,7 @@ class Redirect(BaseCommand):
         
         descriptor = descriptor + ">" + (">" if append else "")
         self.command = "%s %s" % (descriptor, to_file)
-        self.sultan.add(self)
+        self.sultan._add(self)
         return self.sultan
 
     def __str__(self):

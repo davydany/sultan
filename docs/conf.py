@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
-# sultan documentation build configuration file, created by
-# sphinx-quickstart on Wed Oct 12 07:23:51 2016.
+# Sultan documentation build configuration file, created by
+# sphinx-quickstart on Thu Oct 13 05:54:04 2016.
 #
 # This file is execfile()d with the current directory set to its
 # containing dir.
@@ -16,11 +16,11 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-# import os
-# import sys
-# sys.path.insert(0, os.path.abspath('.'))
-from recommonmark.parser import CommonMarkParser
+import os
+import sys
+import sphinx_rtd_theme
 
+sys.path.insert(0, os.path.abspath('../src'))
 
 # -- General configuration ------------------------------------------------
 
@@ -33,8 +33,6 @@ from recommonmark.parser import CommonMarkParser
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
-    'sphinx.ext.doctest',
-    'sphinx.ext.todo',
     'sphinx.ext.coverage',
     'sphinx.ext.viewcode',
     'sphinx.ext.githubpages',
@@ -47,7 +45,7 @@ templates_path = ['_templates']
 # You can specify multiple suffix as a list of string:
 #
 # source_suffix = ['.rst', '.md']
-source_suffix = '.md'
+source_suffix = '.rst'
 
 # The encoding of source files.
 #
@@ -57,9 +55,9 @@ source_suffix = '.md'
 master_doc = 'index'
 
 # General information about the project.
-project = u'sultan'
-copyright = u'2016, David G. Daniel'
-author = u'David G. Daniel'
+project = u'Sultan'
+copyright = u'2016, Aeroxis, LLC'
+author = u'Aeroxis, LLC'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -120,7 +118,7 @@ pygments_style = 'sphinx'
 # keep_warnings = False
 
 # If true, `todo` and `todoList` produce output, else they produce nothing.
-todo_include_todos = True
+todo_include_todos = False
 
 
 # -- Options for HTML output ----------------------------------------------
@@ -128,7 +126,9 @@ todo_include_todos = True
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'alabaster'
+html_theme = 'sphinx_rtd_theme'
+
+html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -142,7 +142,7 @@ html_theme = 'alabaster'
 # The name for this set of Sphinx documents.
 # "<project> v<release> documentation" by default.
 #
-# html_title = u'sultan v0.1.13'
+# html_title = u'Sultan v0.1.13'
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
 #
@@ -242,7 +242,7 @@ html_static_path = ['_static']
 # html_search_scorer = 'scorer.js'
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'sultandoc'
+htmlhelp_basename = 'Sultandoc'
 
 # -- Options for LaTeX output ---------------------------------------------
 
@@ -268,8 +268,8 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'sultan.tex', u'sultan Documentation',
-     u'David G. Daniel', 'manual'),
+    (master_doc, 'Sultan.tex', u'Sultan Documentation',
+     u'Aeroxis, LLC', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -310,7 +310,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'sultan', u'sultan Documentation',
+    (master_doc, 'sultan', u'Sultan Documentation',
      [author], 1)
 ]
 
@@ -325,8 +325,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'sultan', u'sultan Documentation',
-     author, 'sultan', 'One line description of project.',
+    (master_doc, 'Sultan', u'Sultan Documentation',
+     author, 'Sultan', 'One line description of project.',
      'Miscellaneous'),
 ]
 
@@ -345,11 +345,3 @@ texinfo_documents = [
 # If true, do not generate a @detailmenu in the "Top" node's menu.
 #
 # texinfo_no_detailmenu = False
-
-
-# -- Configuration for ReadTheDocs --------------------------------------------
-
-# Sets the parser for the source
-source_parsers = {
-    '.md': CommonMarkParser
-}
