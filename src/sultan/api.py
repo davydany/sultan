@@ -1,21 +1,61 @@
+__doc__ = """
+======
+Sultan
+======
+
+**Command and Rule over your Shell**
+
+Sultan is a Python package for interfacing with command-line utilities, like 
+`yum`, `apt-get`, or `ls`, in a Pythonic manner. It lets you run command-line 
+utilities using simple function calls. 
+
+Here is how you'd use Sultan::
+
+    from sultan.api import Sultan
+
+    def install_tree():
+        '''
+        Install 'tree' package.
+        '''
+        s = Sultan()
+        s.sudo("yum install -y tree").run()
+
+Here is how to use Sultan with Context Management::
+
+    from sultan.api import Sultan
+
+    def echo_hosts():
+        '''
+        Echo the contents of `/etc/hosts`
+        '''
+        with Sultan.load(cwd="/etc") as s:
+            s.cat("hosts").run()
+
+That's it!
+
+"""
+
 import os
 import subprocess
 import traceback
 
 from .core import Base
-from .conf import Settings
+from .config import Settings
 from .err import InvalidContextError
 from .echo import Echo
 
+__all__ = ['Sultan']
 
 class Sultan(Base):
-
+    """
+    The Pythonic interface to Bash.
+    """
     commands = None
     _context = None
     
     @classmethod
     def load(cls, cwd=None, **kwargs):
-
+        
         context = {}
         context['cwd'] = cwd
         context.update(kwargs)
@@ -44,7 +84,24 @@ class Sultan(Base):
         return self._context[-1] if len(self._context) > 0 else {}
         
     def __enter__(self):
+        """
+        Sultan can be used with context using `with` blocks, as such:
 
+        ```python
+
+        with Sultan.load(cwd="/tmp") as s:
+            s.ls("-lah").run()
+        ```
+
+        This is easier to manage than doing the following::
+        
+            s = Sultan()
+            s.cd("/tmp").and_().ls("-lah").run()
+
+        There are one-off times when running `s.cd("/tmp").and_().ls("-lah").run()` works better. However, 
+        if you have multiple commands to run in a given directory, using Sultan with context, allows your
+        code to be easy to manage.
+        """
         # do nothing since we got 'current_context' and '_context' are doing the work
         # however, we do want to alert the user that they're using contexts badly.
         if len(self._context) == 0:
@@ -52,12 +109,14 @@ class Sultan(Base):
         return self
 
     def __exit__(self, type, value, traceback):
-
+        """
+        Restores the context to previous context.
+        """
         if len(self._context) > 0:
             self._context.pop()
         
     def __call__(self):
-
+        
         if self.commands:
 
             # run commands
@@ -74,7 +133,9 @@ class Sultan(Base):
             return Command(self, name)
 
     def run(self, halt_on_nonzero=True):
-
+        """
+        After building your commands, call `run()` to have your code executed.
+        """
         commands = str(self)
         self.__echo.cmd(commands)
         try:
@@ -95,8 +156,12 @@ class Sultan(Base):
             # clear the buffer
             self.clear()
 
-    def add(self, command):
-
+    def _add(self, command):
+        """
+        Private method that adds a custom command (see `pipe` and `and_`).
+        
+        NOT FOR PUBLIC USE 
+        """
         self.commands.append(command)
         return self
 
@@ -106,7 +171,9 @@ class Sultan(Base):
         return self
 
     def __str__(self):
-
+        """
+        Returns the chained commands that were built as a string.
+        """
         context = self.current_context
         SPECIAL_CASES = (Pipe, And, Redirect)
         output = ""
@@ -137,21 +204,42 @@ class Sultan(Base):
         return output
 
     def spit(self):
-
+        """
+        Logs to the logger the command.
+        """
         self.__echo.log(str(self))
 
     def pipe(self):
+        """
+        Pipe commands in Sultan.
 
-        self.add(Pipe(self, '|'))
+        Usage::
+
+            # runs: 'cat /var/log/foobar.log | grep 192.168.1.1'
+            s = Sultan()
+            s.cat("/var/log/foobar.log").pipe().grep("192.168.1.1").run()
+        """
+        self._add(Pipe(self, '|'))
         return self
 
     def and_(self):
+        """
+        Combines multiple commands using `&&`.
 
-        self.add(And(self, "&&"))
+        Usage::
+
+            # runs: 'cd /tmp && touch foobar.txt'
+            s = Sultan()
+            s.cd("/tmp").and_().touch("foobar.txt").run()
+        """
+        self._add(And(self, "&&"))
         return self
 
     
 class BaseCommand(Base):
+    """
+    The Base class for all commands.
+    """
 
     command = None
     args = None
@@ -167,7 +255,11 @@ class BaseCommand(Base):
         self.context = context if context else {}
 
 class Command(BaseCommand):
+    """
+    The class that all commands are based off. Essentially, when we run 
+    `Sultan().foo()`, `foo` is represented as an instance of `Command`.
 
+    """
     def __call__(self, *args, **kwargs):
 
         # check for 'where' in kwargs
@@ -188,7 +280,7 @@ class Command(BaseCommand):
 
         self.args = [str(a) for a in args]
         self.kwargs = kwargs
-        self.sultan.add(self)
+        self.sultan._add(self)
         return self.sultan
 
     def __str__(self):
@@ -214,7 +306,9 @@ class Command(BaseCommand):
         return output
 
 class Pipe(BaseCommand):
-
+    """
+    Representation of the Pipe `|` operator.
+    """
     def __call__(self):
 
         pass # do nothing
@@ -224,7 +318,9 @@ class Pipe(BaseCommand):
         return self.command
 
 class And(BaseCommand):
-
+    """
+    Representation of the And `&&` operator.
+    """
     def __call__(self):
 
         pass # do nothing
@@ -234,7 +330,9 @@ class And(BaseCommand):
         return self.command
 
 class Redirect(BaseCommand):
-
+    """
+    Representation of the Redirect (`>`, `>>`, ...) operator.
+    """
     def __call__(self, to_file, append=False, stdout=False, stderr=False):
         
         descriptor = None
@@ -250,7 +348,7 @@ class Redirect(BaseCommand):
         
         descriptor = descriptor + ">" + (">" if append else "")
         self.command = "%s %s" % (descriptor, to_file)
-        self.sultan.add(self)
+        self.sultan._add(self)
         return self.sultan
 
     def __str__(self):
