@@ -40,7 +40,7 @@ import subprocess
 import traceback
 
 from .core import Base
-from .conf import Settings
+from .config import Settings
 from .err import InvalidContextError
 from .echo import Echo
 
