@@ -137,15 +137,19 @@ class SultanTestCase(unittest.TestCase):
 
     def test_calling_context_sudo(self):
 
+        # no sudo
         with Sultan.load(sudo=False) as sultan:
             self.assertEqual(str(sultan.ls('-lah', '/root')), 'ls -lah /root;')
 
+        # sudo as another user
         with Sultan.load(sudo=True, user='hodor') as sultan:
             self.assertEqual(str(sultan.ls("/home/hodor")), "sudo su - hodor -c 'ls /home/hodor;'")
 
+        # sudo as root
         with Sultan.load(sudo=True) as sultan:
             self.assertEqual(str(sultan.ls('-lah', '/root')), "sudo su - root -c 'ls -lah /root;'")
 
+        # sudo as another user with cwd set
         with Sultan.load(sudo=True, user='hodor', cwd='/home/hodor') as sultan:
             self.assertEqual(str(sultan.ls('-lah', '.')), "sudo su - hodor -c 'cd /home/hodor && ls -lah .;'")
 
