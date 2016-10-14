@@ -34,8 +34,8 @@ the `tree` package. You'd do the following::
 
     from sultan.api import Sultan
 
-    s = Sultan()
-    s.sudo("yum install -y tree").run()
+    with Sultan.load(sudo=True) as s:
+        s.yum('install -y tree').run()
 
 
 
@@ -103,3 +103,27 @@ Here is the example::
 
     name = s.stdin("What is your name?")
     print "Hello %s" % name
+
+Example 7: Running as Another User
+----------------------------------
+
+Sultan can run commands as another user. You need to enable `sudo` 
+mode to do this.
+
+Here is an example::
+
+    # runs: sudo su - hodor -c 'cd /home/hodor && ls -lah .;'
+    with Sultan.load(sudo=True, user='hodor', cwd='/home/hodor') as s:
+        sultan.ls('-lah', '.')
+
+Example 8: Running as Root
+--------------------------
+
+Sultan can run commands as the `root` user. You need to only enable `sudo` 
+mode to do this.
+
+Here is an example::
+
+    # runs: sudo su - root -c 'ls -lah /root;'
+    with Sultan.load(sudo=True) as sultan:
+        sultan.ls('-lah', '/root')

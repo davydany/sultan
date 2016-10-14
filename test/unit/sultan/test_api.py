@@ -3,6 +3,8 @@ import os
 import shutil
 import subprocess
 import unittest
+import getpass
+
 from sultan.api import And, Command, Pipe, Redirect, Sultan
 from sultan.config import Settings
 from sultan.echo import Echo
@@ -112,17 +114,40 @@ class SultanTestCase(unittest.TestCase):
     def test_calling_context(self):
 
         sultan = Sultan.load(cwd='/tmp', test_key='test_val')
-        self.assertEqual(sultan.current_context, { 'cwd': '/tmp', 'test_key': 'test_val' })
+        self.assertEqual(sultan.current_context, { 'cwd': '/tmp', 'sudo': False, 'test_key': 'test_val', 'user': getpass.getuser() })
 
+        # cwd
         with Sultan.load(cwd='/tmp') as sultan:
+            self.assertEqual(sultan.current_context, { 'cwd': '/tmp', 'sudo': False, 'user': getpass.getuser() })
 
-            self.assertEqual(sultan.current_context, { 'cwd': '/tmp' })
+        # sudo
+        with Sultan.load(cwd='/tmp', sudo=True) as sultan:
+            self.assertEqual(sultan.current_context, { 'cwd': '/tmp', 'sudo': True, 'user': 'root' })
+
+        with Sultan.load(cwd='/tmp', sudo=False, user="hodor") as sultan:
+            self.assertEqual(sultan.current_context, { 'cwd': '/tmp', 'sudo': False, 'user': 'hodor' })
+
+        with Sultan.load(sudo=True) as sultan:
+            self.assertEqual(sultan.current_context, { 'cwd': None, 'sudo': True, 'user': 'root' })
 
     def test_context_for_pwd(self):
 
         with Sultan.load(cwd='/tmp') as sultan:
-
             self.assertEqual(str(sultan.ls('-lah')), 'cd /tmp && ls -lah;')
+
+    def test_calling_context_sudo(self):
+
+        with Sultan.load(sudo=False) as sultan:
+            self.assertEqual(str(sultan.ls('-lah', '/root')), 'ls -lah /root;')
+
+        with Sultan.load(sudo=True, user='hodor') as sultan:
+            self.assertEqual(str(sultan.ls("/home/hodor")), "sudo su - hodor -c 'ls /home/hodor;'")
+
+        with Sultan.load(sudo=True) as sultan:
+            self.assertEqual(str(sultan.ls('-lah', '/root')), "sudo su - root -c 'ls -lah /root;'")
+
+        with Sultan.load(sudo=True, user='hodor', cwd='/home/hodor') as sultan:
+            self.assertEqual(str(sultan.ls('-lah', '.')), "sudo su - hodor -c 'cd /home/hodor && ls -lah .;'")
 
     def test_calling_context_wrongly(self):
 

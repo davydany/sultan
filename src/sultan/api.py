@@ -30,6 +30,7 @@ That's it!
 
 """
 
+import getpass
 import os
 import subprocess
 import traceback
@@ -49,11 +50,20 @@ class Sultan(Base):
     _context = None
     
     @classmethod
-    def load(cls, cwd=None, **kwargs):
+    def load(cls, cwd=None, sudo=False, user=None, **kwargs):
         
         context = {}
         context['cwd'] = cwd
+        context['sudo'] = sudo
+
+        # determine user
+        if user:
+            context['user'] = user
+        else:
+
+            context['user'] = 'root' if sudo else getpass.getuser()
         context.update(kwargs)
+
         s = Sultan(context=context)
         return s
 
@@ -195,6 +205,12 @@ class Sultan(Base):
         if cwd:
             prepend = "cd %s && " % (cwd)
             output = prepend + output
+        
+        # update with 'sudo' context
+        sudo = context.get('sudo')
+        user = context.get('user')
+        if sudo:
+            output = "sudo su - %s -c '%s'" % (user, output)
         
         return output
 
