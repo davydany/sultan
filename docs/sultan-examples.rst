@@ -91,3 +91,15 @@ Sultan. Here is an example:
 In the example above, we redirected the output of `/etc/hosts` to `~/hosts`. 
 We only outputted the `stdout`, and didn't append to the file if it existed.
 Feel free to customize this method as it fits your needs. 
+
+Example 6: Read from Standard Input
+-----------------------------------
+
+Python has the `raw_input` built-in to read from standard input. Sultan's API 
+wraps around `raw_input` to ask the user for their input from the command line
+and returns the value.
+
+Here is the example::
+
+    name = s.stdin("What is your name?")
+    print "Hello %s" % name
