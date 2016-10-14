@@ -1,12 +1,8 @@
-======
-Sultan
-======
-
-**Command and Rule over your Shell**
-
 .. image:: https://raw.githubusercontent.com/aeroxis/sultan/master/docs/img/sultan-logo.png
   :alt: sultan logo
   :align: right
+
+**Command and Rule over your Shell**
 
 .. image:: https://badge.fury.io/py/sultan.svg
   :alt: PyPI Version
@@ -24,13 +20,15 @@ Sultan
   :alt: Documentation Status
   :target: http://sultan.readthedocs.io/en/latest/?badge=latest
 
-.. note::
-  Sultan currently supports Python `2.7.x`. Version `0.3` of Sultan is slated 
-  to support Python `3.0`.
+----
+Note
+----
 
-.. note::
-  Your input is welcome! Please provide your feedback by creating 
-  `issues on Github <https://github.com/aeroxis/sultan/issues>`_
+1. Sultan currently supports Python `2.7.x`. Version `0.3` of Sultan is 
+slated to support Python `3.0`.
+
+2. Your input is welcome! Please provide your feedback by creating 
+`issues on Github <https://github.com/aeroxis/sultan/issues>`_
 
 -------------
 Documentation
