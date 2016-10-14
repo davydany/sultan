@@ -102,6 +102,13 @@ class SultanTestCase(unittest.TestCase):
         sultan = Sultan()
         self.assertEqual(str(sultan.touch("/tmp/foo").and_().touch("/tmp/bar")), "touch /tmp/foo && touch /tmp/bar;")
 
+    @mock.patch('sultan.api.raw_input')
+    def test_stdin(self, mock_raw_input):
+
+        mock_raw_input.return_value = 'Hodor'
+        sultan = Sultan()
+        self.assertEqual(sultan.stdin('What is your name?'), 'Hodor')
+
     def test_calling_context(self):
 
         sultan = Sultan.load(cwd='/tmp', test_key='test_val')

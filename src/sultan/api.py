@@ -230,6 +230,10 @@ class Sultan(Base):
         self._add(And(self, "&&"))
         return self
 
+    def stdin(self, message):
+
+        return raw_input(message)
+
     
 class BaseCommand(Base):
     """
