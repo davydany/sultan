@@ -33,6 +33,7 @@ That's it!
 import getpass
 import os
 import subprocess
+import tempfile
 import traceback
 
 from .core import Base
@@ -142,21 +143,57 @@ class Sultan(Base):
         """
         After building your commands, call `run()` to have your code executed.
         """
+        def format_lines(lines):
+            for line in lines:
+                self.__echo.error(format_line(line))
+
+        def format_line(msg):
+            return "| %s" % msg
+
         commands = str(self)
         self.__echo.cmd(commands)
+
+        # create a tempfile for stdout and stderr
+        stdout = None
+        stderr, stderr_filepath = tempfile.mkstemp()
+
         try:
-            stdout = subprocess.check_output(commands, shell=True)
+            stdout = subprocess.check_output(commands, shell=True, stderr=stderr)
             response = stdout.strip().split("\n") if stdout else stdout
             return response
         except Exception, e:
+            tb = traceback.format_exc().strip().split("\n")
             
-            self.__echo.error("Unable to run '%s'" % commands)
-            tb = traceback.format_exc().split("\n")
-            for l in tb:
-                self.__echo.critical("    %s" % l)
+            self.__echo.critical("Unable to run '%s'" % commands)
+
+            #traceback
+            self.__echo.critical("--{ TRACEBACK }" + "-" * 100)
+            format_lines(tb)
+            self.__echo.critical("---------------" + "-" * 100)
+
+            # standard out
+            if stdout:
+                self.__echo.critical("--{ STDOUT }---" + "-" * 100)
+                format_lines(stdout)
+                self.__echo.critical("---------------" + "-" * 100)
+
+            # standard error
+            stderr_lines = None
+            with open(stderr_filepath) as f:
+                stderr_lines = f.readlines()
+
+            if stderr_lines:
+                self.__echo.critical("--{ STDERR }---" + "-" * 100)
+                format_lines(stderr_lines)
+                self.__echo.critical("---------------" + "-" * 100)
+            
             if self.settings.HALT_ON_ERROR:
                 if halt_on_nonzero:
                     raise
+
+            if halt_on_nonzero:
+                raise
+
         finally:
             
             # clear the buffer
