@@ -9,7 +9,6 @@ Sultan
 
 **Command and Rule over your Shell**
 
-
 .. automodule:: sultan.api
 
 .. toctree::

@@ -56,8 +56,8 @@ Here is how you'd use Sultan::
         '''
         Install 'tree' package.
         '''
-        s = Sultan()
-        s.sudo("yum install -y tree").run()
+        with Sultan.load(sudo=True) as s:
+            s.yum("install -y tree").run()
 
 Here is how to use Sultan with Context Management::
 

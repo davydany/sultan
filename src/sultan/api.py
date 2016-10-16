@@ -1,8 +1,8 @@
 __doc__ = """
 
 Sultan is a Python package for interfacing with command-line utilities, like 
-`yum`, `apt-get`, or `ls`, in a Pythonic manner. It lets you run command-line 
-utilities using simple function calls. 
+`yum`, `apt-get`, `ls`, or any other command line utilities, in a Pythonic way.
+It lets you run command-line utilities using simple function calls. 
 
 Here is how you'd use Sultan::
 
@@ -12,8 +12,8 @@ Here is how you'd use Sultan::
         '''
         Install 'tree' package.
         '''
-        s = Sultan()
-        s.sudo("yum install -y tree").run()
+        with Sultan.load(sudo=True) as s:
+            s.yum("install -y tree").run()
 
 Here is how to use Sultan with Context Management::
 
@@ -27,7 +27,6 @@ Here is how to use Sultan with Context Management::
             s.cat("hosts").run()
 
 That's it!
-
 """
 
 import getpass
@@ -62,7 +61,6 @@ class Sultan(Base):
         if user:
             context['user'] = user
         else:
-
             context['user'] = 'root' if sudo else getpass.getuser()
         context.update(kwargs)
 
