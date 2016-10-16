@@ -2,33 +2,79 @@ from setuptools import setup, find_packages
 
 LONG_DESCRIPTION = """
 
-## What is Sultan?
+.. image:: https://raw.githubusercontent.com/aeroxis/sultan/master/docs/img/sultan-logo.png
+  :alt: sultan logo
+  :align: right
 
-Sultan is an interface to Bash from Python. Shell commands get to the point of 
-what you want them to do. For example, 
+**Command and Rule over your Shell**
 
-```
-sudo yum install tree
-```
+.. image:: https://badge.fury.io/py/sultan.svg
+  :alt: PyPI Version
+  :target: https://badge.fury.io/py/sultan
 
-would install `tree` on your local machine. However, we normally access command 
-line utilities like `yum`, via bash, and Bash is just not as nice as Python. 
-Python's beautiful syntax make code readable and easy to maintain far more than
-Bash.
+.. image:: https://travis-ci.org/aeroxis/sultan.svg?branch=master
+  :alt: Travis Build Status
+  :target: https://travis-ci.org/aeroxis/sultan
 
-Bash is great for small scripts, but when we get complex scripts, Bash just 
-gets very tough to use. This is why Sultan was created.
+.. image:: http://img.shields.io/:license-mit-blue.svg
+  :alt: MIT License
+  :target: http://doge.mit-license.org
 
-Sultan allows you to run bash commands from inside Python using simple function 
-calls. Here is a quick example to install tree via Sultan.
+.. image:: https://readthedocs.org/projects/sultan/badge/?version=latest
+  :alt: Documentation Status
+  :target: http://sultan.readthedocs.io/en/latest/?badge=latest
 
-```
-from sultan.api import Sultan
+----
+Note
+----
 
-def install_tree():
-    s = Sultan()
-    s.sudo("yum install -y tree").run()
-```
+1. Sultan currently supports Python `2.7.x`. Version `0.3` of Sultan is 
+slated to support Python `3.0`.
+
+2. Your input is welcome! Please provide your feedback by creating 
+`issues on Github <https://github.com/aeroxis/sultan/issues>`_
+
+-------------
+Documentation
+-------------
+
+.. image:: https://readthedocs.org/projects/sultan/badge/?version=latest
+  :alt: Documentation Status
+  :target: http://sultan.readthedocs.io/en/latest/?badge=latest
+
+Documentation is available on ReadTheDocs: http://sultan.readthedocs.io/en/latest/
+
+---------------
+What is Sultan?
+---------------
+
+Sultan is a Python package for interfacing with command-line utilities, like 
+`yum`, `apt-get`, or `ls`, in a Pythonic manner. It lets you run command-line 
+utilities using simple function calls. 
+
+Here is how you'd use Sultan::
+
+    from sultan.api import Sultan
+
+    def install_tree():
+        '''
+        Install 'tree' package.
+        '''
+        with Sultan.load(sudo=True) as s:
+            s.yum("install -y tree").run()
+
+Here is how to use Sultan with Context Management::
+
+    from sultan.api import Sultan
+
+    def echo_hosts():
+        '''
+        Echo the contents of `/etc/hosts`
+        '''
+        with Sultan.load(cwd="/etc") as s:
+            s.cat("hosts").run()
+
+That's it!
 """
 
 setup(
