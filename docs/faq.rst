@@ -7,7 +7,7 @@ Frequently Asked Questions
 Sultan is just a simpler interface to command line utilities. It helps bypass
 the arcane language constructs of Bash. 
 
-I wrote Sultan to help with scripts that we create with Bash, that tend to get
+Sultan is made to help with scripts that we create with Bash, that tend to get
 complex. When these scripts get complex, Bash just gets to be a pain to deal 
 with, since it lacks package management, it lacks unit testing, and 
 <insert library that you need for managing complex scripts>. 
