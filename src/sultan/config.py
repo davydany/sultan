@@ -3,7 +3,15 @@ import os
 from .core import Base
 
 DEFAULT_SETTINGS = {
-    "HALT_ON_ERROR": True
+    "HALT_ON_ERROR": True,
+    "LOG_FORMAT": '%(log_color)s[%(name)s]: %(message)s',
+    "LOG_COLORS": {
+        'DEBUG': 'cyan',
+        'INFO': 'green',
+        'WARNING': 'yellow',
+        'ERROR': 'red',
+        'CRITICAL': 'bold_red',
+    }
 }
 
 class Settings(Base):

@@ -1,17 +1,12 @@
 import logging
 from sultan.core import Base
 from sultan.echo.colorlog import StreamHandler, ColoredFormatter
+from sultan.config import settings
 
 handler = StreamHandler()
 handler.setFormatter(ColoredFormatter(
-    '%(log_color)s[%(name)s]: %(message)s',
-    log_colors={
-        'DEBUG': 'cyan',
-        'INFO': 'green',
-        'WARNING': 'yellow',
-        'ERROR': 'red',
-        'CRITICAL': 'bold_red',
-    }
+    settings.LOG_FORMAT,
+    log_colors=settings.LOG_COLORS
 ))
 
 
