@@ -79,7 +79,7 @@ Example 5: Redirecting Output to File
 
 In Bash, we often want to redirect the output of a command to file. Whether 
 the output is in `stdout` or `stderr`, we can redirect it to a file with 
-Sultan. Here is an example:
+Sultan. Here is an example::
 
     # runs: 'cat /etc/hosts > ~/hosts'
     s.cat("/etc/hosts").redirect(

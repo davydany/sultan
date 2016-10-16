@@ -17,6 +17,7 @@ Sultan
     :maxdepth: 2
 
     install-sultan
+    faq
     sultan-examples
 
 * :ref:`genindex`
