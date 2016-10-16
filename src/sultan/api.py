@@ -12,14 +12,14 @@ Here is how you'd use Sultan::
     s.sudo("yum install -y tree").run()
 
     # with context management (recommended)
-      with Sultan.load(sudo=True) as s:
-          s.yum("install -y tree").run()
+    with Sultan.load(sudo=True) as s:
+        s.yum("install -y tree").run()
 
 What if we want to install this command on a remote machine? You can easily 
 achieve this using context management::
 
-  with open(sudo=True, hostname="myserver.com") as s:
-    s.yum("install -y tree").run()
+    with open(sudo=True, hostname="myserver.com") as s:
+        s.yum("install -y tree").run()
 
 If you enter a wrong command, Sultan will print out details you need to debug and 
 find the problem quickly.
