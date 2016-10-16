@@ -50,11 +50,12 @@ class Sultan(Base):
     _context = None
     
     @classmethod
-    def load(cls, cwd=None, sudo=False, user=None, **kwargs):
+    def load(cls, cwd=None, sudo=False, user=None, hostname=None, **kwargs):
         
         context = {}
         context['cwd'] = cwd
         context['sudo'] = sudo
+        context['hostname'] = hostname
 
         # determine user
         if user:
@@ -209,8 +210,17 @@ class Sultan(Base):
         # update with 'sudo' context
         sudo = context.get('sudo')
         user = context.get('user')
+        hostname = context.get('hostname')
         if sudo:
             output = "sudo su - %s -c '%s'" % (user, output)
+
+        if hostname:
+            params = {
+                'user': user,
+                'hostname': hostname,
+                'command': output
+            }
+            output = "ssh %(user)s@%(hostname)s '%(command)s'" % (params)
         
         return output
 
