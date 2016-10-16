@@ -4,7 +4,14 @@ from sultan.echo.colorlog import StreamHandler, ColoredFormatter
 
 handler = StreamHandler()
 handler.setFormatter(ColoredFormatter(
-    '%(log_color)s[%(name)s]: %(message)s'
+    '%(log_color)s[%(name)s]: %(message)s',
+    log_colors={
+        'DEBUG': 'cyan',
+        'INFO': 'green',
+        'WARNING': 'yellow',
+        'ERROR': 'red',
+        'CRITICAL': 'bold_red',
+    }
 ))
 
 
