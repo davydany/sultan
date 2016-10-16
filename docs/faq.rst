@@ -2,6 +2,17 @@
 Frequently Asked Questions
 ==========================
 
+**What is Sultan?**
+
+Sultan allows you to interface with command-line utilities from Python without
+having to write your scripts in Bash. 
+
+**Why can't I use `subprocess`?**
+
+Python's standard library offers the subprocess library, but it isn't very 
+"Pythonic". The 'subprocess' module has a bunch of methods for writing commands
+to the shell, but the code is overly verbose, and tough to read. 
+
 **Any reason to use this over ansible or saltstack?**
 
 Sultan is just a simpler interface to command line utilities. It helps bypass
