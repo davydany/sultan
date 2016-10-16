@@ -1,32 +1,54 @@
 __doc__ = """
-
 Sultan is a Python package for interfacing with command-line utilities, like 
-`yum`, `apt-get`, `ls`, or any other command line utilities, in a Pythonic way.
-It lets you run command-line utilities using simple function calls. 
+`yum`, `apt-get`, or `ls`, in a Pythonic manner. It lets you run command-line 
+utilities using simple function calls. 
 
 Here is how you'd use Sultan::
 
     from sultan.api import Sultan
 
-    def install_tree():
-        '''
-        Install 'tree' package.
-        '''
-        with Sultan.load(sudo=True) as s:
-            s.yum("install -y tree").run()
+    # simple way
+    s = Sultan()
+    s.sudo("yum install -y tree").run()
 
-Here is how to use Sultan with Context Management::
+    # with context management (recommended)
+      with Sultan.load(sudo=True) as s:
+          s.yum("install -y tree").run()
 
-    from sultan.api import Sultan
+What if we want to install this command on a remote machine? You can easily 
+achieve this using context management::
 
-    def echo_hosts():
-        '''
-        Echo the contents of `/etc/hosts`
-        '''
-        with Sultan.load(cwd="/etc") as s:
-            s.cat("hosts").run()
+  with open(sudo=True, hostname="myserver.com") as s:
+    s.yum("install -y tree").run()
 
-That's it!
+If you enter a wrong command, Sultan will print out details you need to debug and 
+find the problem quickly.
+
+Here, the same command was run on a Mac::
+
+    In [1]: with Sultan.load(sudo=True) as s:
+      ...:     s.yum("install -y tree").run()
+      ...:
+    [sultan]: sudo su - root -c 'yum install -y tree;'
+    Password:
+    [sultan]: Unable to run 'sudo su - root -c 'yum install -y tree;''
+    [sultan]: --{ TRACEBACK }----------------------------------------------------------------------------------------------------
+    [sultan]: | Traceback (most recent call last):
+    [sultan]: |   File "/Users/davydany/projects/aeroxis/sultan/src/sultan/api.py", line 159, in run
+    [sultan]: |     stdout = subprocess.check_output(commands, shell=True, stderr=stderr)
+    [sultan]: |   File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/subprocess.py", line 573, in check_output
+    [sultan]: |     raise CalledProcessError(retcode, cmd, output=output)
+    [sultan]: | CalledProcessError: Command 'sudo su - root -c 'yum install -y tree;'' returned non-zero exit status 127
+    [sultan]: -------------------------------------------------------------------------------------------------------------------
+    [sultan]: --{ STDERR }-------------------------------------------------------------------------------------------------------
+    [sultan]: | -sh: yum: command not found
+    [sultan]: -------------------------------------------------------------------------------------------------------------------
+
+Want to get started? Simply install Sultan, and start writing your clean code::
+
+    pip install --upgrade sultan
+
+If you have more questions, check the docs! http://sultan.readthedocs.io/en/latest/
 """
 
 import getpass
