@@ -65,9 +65,9 @@ author = u'Aeroxis, LLC'
 MAJOR, MINOR, RELEASE = None, None, None
 with open("../VERSION") as f:
     line = f.read()
-    if line.count('.') == 2:
+    if line.count('.') == 1:
         MAJOR, MINOR = line.split(".")
-    elif line.count('.') == 3:
+    elif line.count('.') == 2:
         MAJOR, MINOR, RELEASE = line.split(".")
 
 # The short X.Y version.
