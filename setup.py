@@ -16,6 +16,7 @@ setup(
     license='MIT',
     packages=find_packages('src'),
     package_dir={'': 'src'},
+    package_data={'': ['VERSION']},
     url='http://github.com/aeroxis/sultan',
     classifiers=[
         "Development Status :: 5 - Production/Stable",

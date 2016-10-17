@@ -52,18 +52,21 @@ The simplest way to use Sultan is to just call it:
 
 .. image:: https://raw.githubusercontent.com/aeroxis/sultan/master/docs/img/readme-1-simple-usage.png
   :alt: Sultan's Simple usage
+  :width: 750 px
 
 The recommended way of using Sultan is to use it in Context Management mode. 
 Here is how to use Sultan with Context Management:
 
 .. image:: https://raw.githubusercontent.com/aeroxis/sultan/master/docs/img/readme-2-context-manager.png
   :alt: Sultan's Context Manager
+  :width: 750 px
 
 What if we want to install this command on a remote machine? You can easily 
 achieve this using context management:
 
 .. image:: https://raw.githubusercontent.com/aeroxis/sultan/master/docs/img/readme-3-ssh-access.png
   :alt: Sultan's Context Manager for SSH access
+  :width: 750 px
 
 If you enter a wrong command, Sultan will print out details you need to debug and 
 find the problem quickly.
@@ -72,6 +75,7 @@ Here, the same command was run on a Mac:
 
 .. image:: https://raw.githubusercontent.com/aeroxis/sultan/master/docs/img/readme-4-error-message.png
   :alt: Sultan's Error Management
+  :width: 750 px
 
 Want to get started? Simply install Sultan, and start writing your clean code::
 
