@@ -1,3 +1,12 @@
+# 0.2.3 (released October 17, 2016)
+- Fixed issue where Sultan could not be installed. This is because VERSION file was
+not included with the PyPi artifact. Fix was to add `MANIFEST.in` to resolve this.
+
+# 0.2.2 (released October 17, 2016)
+- Minor bug fixes
+
+# 0.2.1 (released October 17, 2016)
+- Fixed bug where too many file descriptors were openned when `run()` was called.
 
 # 0.2 (released October 15, 2016)
 
