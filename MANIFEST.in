@@ -1,0 +1,9 @@
+include CHANGELOG
+include LICENSE
+include VERSION
+include README.rst
+graft docs
+graft src
+graft requirements
+global-exclude __pycache__
+global-exclude *.py[co]
