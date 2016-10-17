@@ -173,12 +173,14 @@ class Sultan(Base):
         commands = str(self)
         self.__echo.cmd(commands)
 
-        # create a tempfile for stdout and stderr
-        stdout = None
-        stderr, stderr_filepath = tempfile.mkstemp()
-
+        stdout, stderr = None, None
         try:
-            stdout = subprocess.check_output(commands, shell=True, stderr=stderr)
+            stdout, stderr = subprocess.Popen(commands, 
+                shell=True, 
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE).communicate()
+
+            # stdout = subprocess.check_output(commands, shell=True, stderr=stderr)
             response = stdout.strip().split("\n") if stdout else stdout
             return response
         except Exception, e:
@@ -202,9 +204,9 @@ class Sultan(Base):
             with open(stderr_filepath) as f:
                 stderr_lines = f.readlines()
 
-            if stderr_lines:
+            if stderr:
                 self.__echo.critical("--{ STDERR }---" + "-" * 100)
-                format_lines(stderr_lines)
+                format_lines(stderr)
                 self.__echo.critical("---------------" + "-" * 100)
             
             if self.settings.HALT_ON_ERROR:
