@@ -177,6 +177,7 @@ class Sultan(Base):
         try:
             stdout, stderr = subprocess.Popen(commands, 
                 shell=True, 
+                stdin=subprocess.PIPE,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE).communicate()
 
@@ -200,10 +201,6 @@ class Sultan(Base):
                 self.__echo.critical("---------------" + "-" * 100)
 
             # standard error
-            stderr_lines = None
-            with open(stderr_filepath) as f:
-                stderr_lines = f.readlines()
-
             if stderr:
                 self.__echo.critical("--{ STDERR }---" + "-" * 100)
                 format_lines(stderr)
