@@ -28,10 +28,11 @@ class SultanTestCase(unittest.TestCase):
     @mock.patch("sultan.api.subprocess")
     def test_run_basic(self, m_subprocess):
 
-        m_subprocess.check_output.return_value = "sample_response"
+        m_subprocess.Popen = mock.Mock()
+        m_subprocess.Popen().communicate.return_value = ("sample_response", "")
         sultan = Sultan()
         response = sultan.ls("-lah /tmp").run()
-        self.assertTrue(m_subprocess.check_output.called)
+        self.assertTrue(m_subprocess.Popen().communicate.called)
         self.assertEqual(response, ["sample_response"])
 
     def test_run_advanced(self):
@@ -53,7 +54,8 @@ class SultanTestCase(unittest.TestCase):
     @mock.patch('sultan.api.subprocess')
     def test_run_halt_on_nonzero(self, m_subprocess):
 
-        m_subprocess.check_output.side_effect = subprocess.CalledProcessError(1, "foobar")
+        m_subprocess.Popen = mock.Mock()
+        m_subprocess.Popen().communicate.side_effect = subprocess.CalledProcessError(1, "foobar")
         s = Sultan()
         with self.assertRaises(subprocess.CalledProcessError):
             s.foobar("-qux").run()
