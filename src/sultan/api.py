@@ -159,7 +159,7 @@ class Sultan(Base):
         else:
             return Command(self, name)
 
-    def run(self, halt_on_nonzero=True):
+    def run(self, halt_on_nonzero=True, quiet=False, q=False):
         """
         After building your commands, call `run()` to have your code executed.
         """
@@ -171,7 +171,8 @@ class Sultan(Base):
             return "| %s" % msg
 
         commands = str(self)
-        self.__echo.cmd(commands)
+        if not (quiet or q):
+            self.__echo.cmd(commands)
 
         stdout, stderr = None, None
         try:
