@@ -1,6 +1,6 @@
 """The ColoredFormatter class."""
 
-from __future__ import absolute_import
+
 
 import logging
 import collections
@@ -120,7 +120,7 @@ class ColoredFormatter(logging.Formatter):
 
         # Set secondary log colors
         if self.secondary_log_colors:
-            for name, log_colors in self.secondary_log_colors.items():
+            for name, log_colors in list(self.secondary_log_colors.items()):
                 color = self.color(log_colors, record.levelname)
                 setattr(record, name + '_log_color', color)
 
@@ -187,7 +187,7 @@ class LevelFormatter(ColoredFormatter):
                 # (code based on stdlib's logging.Formatter.__init__())
                 if self.style not in logging._STYLES:
                     raise ValueError('Style must be one of: %s' % ','.join(
-                        logging._STYLES.keys()))
+                        list(logging._STYLES.keys())))
                 self._style = logging._STYLES[self.style][0](self._fmt)
 
         if sys.version_info > (2, 7):

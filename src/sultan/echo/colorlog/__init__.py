@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+
 """
 Python-Colorlog is a library created by 'borntyping', and hosted on Github at 
 https://github.com/borntyping/python-colorlog using the MIT License. In 

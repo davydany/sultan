@@ -1,6 +1,6 @@
 """Fixtures that can be used in other tests."""
 
-from __future__ import print_function
+
 
 import inspect
 import logging
