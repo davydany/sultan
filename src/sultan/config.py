@@ -24,7 +24,7 @@ class Settings(Base):
         if sultan_settings_module_env in os.environ:
 
             settings = __import__(os.environ[sultan_settings_module_env])
-            for k, v in settings.iteritems():
+            for k, v in settings.items():
                 settings[k] = v
 
         if attr in settings:
