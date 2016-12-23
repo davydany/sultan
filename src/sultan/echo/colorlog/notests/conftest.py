@@ -1,6 +1,6 @@
 """Fixtures that can be used in other tests."""
 
- from __future__ import absolute_import
+from __future__ import absolute_import
 
 
 import inspect
