@@ -56,6 +56,7 @@ import os
 import subprocess
 import tempfile
 import traceback
+import sys
 
 from .core import Base
 from .config import Settings
@@ -64,7 +65,7 @@ from .echo import Echo
 
 __all__ = ['Sultan']
 
-if sys.version < (3, 0):
+if sys.version_info < (3, 0):
     input = raw_input
 
 class Sultan(Base):
