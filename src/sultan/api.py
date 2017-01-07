@@ -64,6 +64,9 @@ from .echo import Echo
 
 __all__ = ['Sultan']
 
+if sys.version < (3, 0):
+    input = raw_input
+
 class Sultan(Base):
     """
     The Pythonic interface to Bash.
