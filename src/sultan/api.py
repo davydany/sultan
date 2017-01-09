@@ -1,7 +1,7 @@
 __doc__ = """
-Sultan is a Python package for interfacing with command-line utilities, like 
-`yum`, `apt-get`, or `ls`, in a Pythonic manner. It lets you run command-line 
-utilities using simple function calls. 
+Sultan is a Python package for interfacing with command-line utilities, like
+`yum`, `apt-get`, or `ls`, in a Pythonic manner. It lets you run command-line
+utilities using simple function calls.
 
 Here is how you'd use Sultan::
 
@@ -15,13 +15,13 @@ Here is how you'd use Sultan::
     with Sultan.load(sudo=True) as s:
         s.yum("install -y tree").run()
 
-What if we want to install this command on a remote machine? You can easily 
+What if we want to install this command on a remote machine? You can easily
 achieve this using context management::
 
     with open(sudo=True, hostname="myserver.com") as s:
         s.yum("install -y tree").run()
 
-If you enter a wrong command, Sultan will print out details you need to debug and 
+If you enter a wrong command, Sultan will print out details you need to debug and
 find the problem quickly.
 
 Here, the same command was run on a Mac::
@@ -56,6 +56,7 @@ import os
 import subprocess
 import tempfile
 import traceback
+import sys
 
 from .core import Base
 from .config import Settings
@@ -64,16 +65,19 @@ from .echo import Echo
 
 __all__ = ['Sultan']
 
+if sys.version_info < (3, 0):
+    input = raw_input
+
 class Sultan(Base):
     """
     The Pythonic interface to Bash.
     """
     commands = None
     _context = None
-    
+
     @classmethod
     def load(cls, cwd=None, sudo=False, user=None, hostname=None, **kwargs):
-        
+
         context = {}
         context['cwd'] = cwd
         context['sudo'] = sudo
@@ -109,7 +113,7 @@ class Sultan(Base):
         Returns the context that Sultan is running on
         """
         return self._context[-1] if len(self._context) > 0 else {}
-        
+
     def __enter__(self):
         """
         Sultan can be used with context using `with` blocks, as such:
@@ -121,11 +125,11 @@ class Sultan(Base):
         ```
 
         This is easier to manage than doing the following::
-        
+
             s = Sultan()
             s.cd("/tmp").and_().ls("-lah").run()
 
-        There are one-off times when running `s.cd("/tmp").and_().ls("-lah").run()` works better. However, 
+        There are one-off times when running `s.cd("/tmp").and_().ls("-lah").run()` works better. However,
         if you have multiple commands to run in a given directory, using Sultan with context, allows your
         code to be easy to manage.
         """
@@ -141,9 +145,9 @@ class Sultan(Base):
         """
         if len(self._context) > 0:
             self._context.pop()
-        
+
     def __call__(self):
-        
+
         if self.commands:
 
             # run commands
@@ -176,18 +180,21 @@ class Sultan(Base):
 
         stdout, stderr = None, None
         try:
-            stdout, stderr = subprocess.Popen(commands, 
-                shell=True, 
+            stdout, stderr = subprocess.Popen(commands,
+                shell=True,
                 stdin=subprocess.PIPE,
                 stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE).communicate()
+                stderr=subprocess.PIPE,
+                universal_newlines=True).communicate()
 
             # stdout = subprocess.check_output(commands, shell=True, stderr=stderr)
-            response = stdout.strip().split("\n") if stdout else stdout
-            return response
-        except Exception, e:
-            tb = traceback.format_exc().strip().split("\n")
-            
+            if stdout:
+                return stdout.strip().splitlines()
+            return stdout
+
+        except Exception as e:
+            tb = traceback.format_exc().split("\n")
+
             self.__echo.critical("Unable to run '%s'" % commands)
 
             #traceback
@@ -206,7 +213,7 @@ class Sultan(Base):
                 self.__echo.critical("--{ STDERR }---" + "-" * 100)
                 format_lines(stderr)
                 self.__echo.critical("---------------" + "-" * 100)
-            
+
             if self.settings.HALT_ON_ERROR:
                 if halt_on_nonzero:
                     raise
@@ -215,15 +222,15 @@ class Sultan(Base):
                 raise
 
         finally:
-            
+
             # clear the buffer
             self.clear()
 
     def _add(self, command):
         """
         Private method that adds a custom command (see `pipe` and `and_`).
-        
-        NOT FOR PUBLIC USE 
+
+        NOT FOR PUBLIC USE
         """
         self.commands.append(command)
         return self
@@ -255,7 +262,7 @@ class Sultan(Base):
 
             cmd_str = str(cmd)
             output += separator + cmd_str
-            
+
         output = output.strip() + ";"
 
         # update with 'cwd' context
@@ -263,7 +270,7 @@ class Sultan(Base):
         if cwd:
             prepend = "cd %s && " % (cwd)
             output = prepend + output
-        
+
         # update with 'sudo' context
         sudo = context.get('sudo')
         user = context.get('user')
@@ -278,7 +285,7 @@ class Sultan(Base):
                 'command': output
             }
             output = "ssh %(user)s@%(hostname)s '%(command)s'" % (params)
-        
+
         return output
 
     def spit(self):
@@ -315,9 +322,9 @@ class Sultan(Base):
 
     def stdin(self, message):
 
-        return raw_input(message)
+        return input(message)
 
-    
+
 class BaseCommand(Base):
     """
     The Base class for all commands.
@@ -338,7 +345,7 @@ class BaseCommand(Base):
 
 class Command(BaseCommand):
     """
-    The class that all commands are based off. Essentially, when we run 
+    The class that all commands are based off. Essentially, when we run
     `Sultan().foo()`, `foo` is represented as an instance of `Command`.
 
     """
@@ -349,13 +356,13 @@ class Command(BaseCommand):
             where = kwargs.pop('where')
             if not os.path.exists(where):
                 raise IOError("The value for 'where' (%s), for '%s' does not exist." % (where, self.command))
-            
+
             cmd = os.path.join(where, self.command)
             if not os.path.exists(cmd):
                 raise IOError("Command '%s' does not exist in '%s'." % (cmd, where))
 
             self.command = os.path.join(where, cmd)
-        
+
         if "sudo" in kwargs:
             sudo = kwargs.pop("sudo")
             self.command = "sudo " + self.command
@@ -369,7 +376,7 @@ class Command(BaseCommand):
 
         args_str = (" ".join(self.args)).strip()
         kwargs_list = []
-        for k, v in self.kwargs.iteritems():
+        for k, v in self.kwargs.items():
 
             key = None
             value = v
@@ -384,7 +391,7 @@ class Command(BaseCommand):
         output = self.command
         if len(kwargs_str) > 0: output = output + " " + kwargs_str
         if len(args_str) > 0: output = output + " " + args_str
-        
+
         return output
 
 class Pipe(BaseCommand):
@@ -396,7 +403,7 @@ class Pipe(BaseCommand):
         pass # do nothing
 
     def __str__(self):
-        
+
         return self.command
 
 class And(BaseCommand):
@@ -416,7 +423,7 @@ class Redirect(BaseCommand):
     Representation of the Redirect (`>`, `>>`, ...) operator.
     """
     def __call__(self, to_file, append=False, stdout=False, stderr=False):
-        
+
         descriptor = None
         if stdout and stderr:
             descriptor = "&"
@@ -427,7 +434,7 @@ class Redirect(BaseCommand):
                 descriptor = "2"
             else:
                 raise ValueError("You chose redirect to stdout and stderr to be false. This is not valid.")
-        
+
         descriptor = descriptor + ">" + (">" if append else "")
         self.command = "%s %s" % (descriptor, to_file)
         self.sultan._add(self)

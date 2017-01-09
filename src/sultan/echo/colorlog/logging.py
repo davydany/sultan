@@ -7,6 +7,7 @@ import logging
 
 from sultan.echo.colorlog.colorlog import ColoredFormatter
 
+
 BASIC_FORMAT = "%(log_color)s%(levelname)s%(reset)s:%(name)s:%(message)s"
 
 
