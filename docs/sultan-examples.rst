@@ -1,129 +1,121 @@
+.. image:: https://raw.githubusercontent.com/aeroxis/sultan/master/docs/img/sultan-logo.png
+  :alt: sultan logo
+  :align: right
 
-========
-Examples
-========
+**Command and Rule over your Shell**
 
-This tutorial will go through various examples to help in better understanding
-how to use Sultan. Each example will build on the lessons learned from the  
-previous examples. 
+.. image:: https://badge.fury.io/py/sultan.svg
+  :alt: PyPI Version
+  :target: https://badge.fury.io/py/sultan
 
-Example 1: Getting Started
---------------------------
+.. image:: https://travis-ci.org/aeroxis/sultan.svg?branch=master
+  :alt: Travis Build Status
+  :target: https://travis-ci.org/aeroxis/sultan
 
-We typically use `yum` or `apt-get` to install a package on our system. 
-This example installs a package on our system using Sultan. Here is how
-to get started::
+.. image:: http://img.shields.io/:license-mit-blue.svg
+  :alt: MIT License
+  :target: http://doge.mit-license.org
 
-    from sultan.api import Sultan
+.. image:: https://readthedocs.org/projects/sultan/badge/?version=latest
+  :alt: Documentation Status
+  :target: http://sultan.readthedocs.io/en/latest/?badge=latest
 
-    s = Sultan()
-    s.yum("install", "-y", "tree").run()
+----
+Note
+----
 
-Sultan allows multiple syntaxes depending on what your first command is.
-Suppose you want to not use separate tokens, and instead you want to use
-one string, you can write the above example as such::
+1. Sultan currently supports Python `2.7.x`. Version `0.3` of Sultan is 
+slated to support Python `3.0`.
 
+2. Your input is welcome! Please provide your feedback by creating 
+`issues on Github <https://github.com/aeroxis/sultan/issues>`_
 
-    from sultan.api import Sultan
+-------------
+Documentation
+-------------
 
-    s = Sultan()
+.. image:: https://readthedocs.org/projects/sultan/badge/?version=latest
+  :alt: Documentation Status
+  :target: http://sultan.readthedocs.io/en/latest/?badge=latest
+
+Documentation is available on ReadTheDocs: http://sultan.readthedocs.io/en/latest/
+
+---------------
+What is Sultan?
+---------------
+
+Sultan is a Python package for interfacing with command-line utilities, like 
+`yum`, `apt-get`, or `ls`, in a Pythonic manner. It lets you run command-line 
+utilities using simple function calls. 
+
+The simplest way to use Sultan is to just call it:
+
+.. code:: python
+
+  from sultan.api import Sultan
+  s = Sultan()
+  s.sudo("yum install -y tree").run()
+  
+**Runs:** 
+
+.. code:: bash
+
+  sudo install -y tree;
+
+The recommended way of using Sultan is to use it in Context Management mode. 
+Here is how to use Sultan with Context Management:
+
+.. code:: python
+
+  from sultan.api import Sultan
+  s = Sultan()
+  with Sultan.load(sudo=True) as s:
     s.yum("install -y tree").run()
 
-Suppose your user is not a root-user, and you want to call to sudo to install
-the `tree` package. You'd do the following::
+**Runs:** 
 
-    from sultan.api import Sultan
+.. code:: bash
+  
+  sudo su - root -c 'yum install -y tree;'
 
-    with Sultan.load(sudo=True) as s:
-        s.yum('install -y tree').run()
+What if we want to install this command on a remote machine? You can easily 
+achieve this using context management:
 
+.. code:: python
 
+  from sultan.api import Sultan
+  
+  with Sultan.load(sudo=True, hostname="myserver.com") as sultan:
+    sultan.yum("install -y tree").run()
 
-**NOTE:** For the sake of brevity, this tutorial will now start to assume that
-`Sultan` has been imported from `sultan.api` and, the variable `s` has been 
-instantiated as an instance of `Sultan` (`s = Sultan()`). This will change in
-situations where the documentation requires a different usage.
+**Runs:**
 
-Example 2: Sultan with Context Management
------------------------------------------
+.. code:: bash
 
-There are times when we want to manage the context of where Sultan executes 
-your code. To aid with this, we use Sultan in Context Management mode.
+  ssh root@myserver.com 'sudo su - root -c 'yum install -y tree;''
 
-Suppose we want to cat out the contents of `/etc/hosts`, we'd do the following::
+If you enter a wrong command, Sultan will print out details you need to debug and 
+find the problem quickly.
 
-    with Sultan.load(cwd="/etc") as s:
-        s.cat("hosts").run()
+Here, the same command was run on a Mac:
 
-Example 3: Compounding with And (&&)
-------------------------------------
+.. code:: python
 
-There are times when we need multiple commands to run at once. We use the 
-`and_()` command to get through this. Here is an example::
+  from sultan.api import Sultan
 
-    # runs: 'cd /tmp && touch foobar.txt'
-    s.cd("/tmp").and_().touch("foobar.txt").run()
+  
+**Yields:**
 
-Example 4: Redirecting with Pipes (|)
--------------------------------------
+.. code:: bash
 
-In Bash, we use the pipe `|` operator to redirect the output of the call to a 
-command to another command. We do this in Sultan with the `pipe` command. Here
-is an example::
+  [sultan]: sudo su - root -c 'yum install -y tree;'
+  Password:
+  [sultan]: --{ STDERR }-------------------------------------------------------------------------------------------------------
+  [sultan]: | -sh: yum: command not found
+  [sultan]: -------------------------------------------------------------------------------------------------------------------
 
-    # runs: 'ls -l | sed -e "s/[aeio]/u/g"'
-    s.ls('-l').pipe().sed('-e', '"s/[aeio]/u/g"').run()
+Want to get started? Simply install Sultan, and start writing your clean code::
 
-Example 5: Redirecting Output to File
--------------------------------------
+    pip install --upgrade sultan
 
-In Bash, we often want to redirect the output of a command to file. Whether 
-the output is in `stdout` or `stderr`, we can redirect it to a file with 
-Sultan. Here is an example::
-
-    # runs: 'cat /etc/hosts > ~/hosts'
-    s.cat("/etc/hosts").redirect(
-        "~/hosts", 
-        append=False, 
-        stdout=True, 
-        stderr=False)
-
-In the example above, we redirected the output of `/etc/hosts` to `~/hosts`. 
-We only outputted the `stdout`, and didn't append to the file if it existed.
-Feel free to customize this method as it fits your needs. 
-
-Example 6: Read from Standard Input
------------------------------------
-
-Python has the `raw_input` built-in to read from standard input. Sultan's API 
-wraps around `raw_input` to ask the user for their input from the command line
-and returns the value.
-
-Here is the example::
-
-    name = s.stdin("What is your name?")
-    print "Hello %s" % name
-
-Example 7: Running as Another User
-----------------------------------
-
-Sultan can run commands as another user. You need to enable `sudo` 
-mode to do this.
-
-Here is an example::
-
-    # runs: sudo su - hodor -c 'cd /home/hodor && ls -lah .;'
-    with Sultan.load(sudo=True, user='hodor', cwd='/home/hodor') as s:
-        sultan.ls('-lah', '.')
-
-Example 8: Running as Root
---------------------------
-
-Sultan can run commands as the `root` user. You need to only enable `sudo` 
-mode to do this.
-
-Here is an example::
-
-    # runs: sudo su - root -c 'ls -lah /root;'
-    with Sultan.load(sudo=True) as sultan:
-        sultan.ls('-lah', '/root')
+If you have more questions, check the docs! http://sultan.readthedocs.io/en/latest/

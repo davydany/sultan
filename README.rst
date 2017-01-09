@@ -50,6 +50,15 @@ utilities using simple function calls.
 
 The simplest way to use Sultan is to just call it:
 
+.. code:: python
+
+  In [1]: from sultan.api import Sultan
+
+  In [2]: s = Sultan()
+
+  In [3]: s.sudo("yum install -y tree").run()
+  [sultan]: sudo install -y tree;
+
 .. image:: https://raw.githubusercontent.com/aeroxis/sultan/master/docs/img/readme-1-simple-usage.png
   :alt: Sultan's Simple usage
   :width: 750 px
