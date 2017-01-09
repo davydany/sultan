@@ -20,14 +20,17 @@
   :alt: Documentation Status
   :target: http://sultan.readthedocs.io/en/latest/?badge=latest
 
+Sultan now supports the following Python versions:
+
+  - "2.7"
+  - "3.3"
+  - "3.4"
+  - "3.5"
+  
 ----
 Note
 ----
-
-1. Sultan currently supports Python `2.7.x`. Version `0.3` of Sultan is 
-slated to support Python `3.0`.
-
-2. Your input is welcome! Please provide your feedback by creating 
+Your input is welcome! Please provide your feedback by creating 
 `issues on Github <https://github.com/aeroxis/sultan/issues>`_
 
 -------------
