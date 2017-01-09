@@ -52,39 +52,67 @@ The simplest way to use Sultan is to just call it:
 
 .. code:: python
 
-  In [1]: from sultan.api import Sultan
+  from sultan.api import Sultan
+  s = Sultan()
+  s.sudo("yum install -y tree").run()
+  
+**Runs:** 
 
-  In [2]: s = Sultan()
+.. code:: bash
 
-  In [3]: s.sudo("yum install -y tree").run()
-  [sultan]: sudo install -y tree;
-
-.. image:: https://raw.githubusercontent.com/aeroxis/sultan/master/docs/img/readme-1-simple-usage.png
-  :alt: Sultan's Simple usage
-  :width: 750 px
+  sudo install -y tree;
 
 The recommended way of using Sultan is to use it in Context Management mode. 
 Here is how to use Sultan with Context Management:
 
-.. image:: https://raw.githubusercontent.com/aeroxis/sultan/master/docs/img/readme-2-context-manager.png
-  :alt: Sultan's Context Manager
-  :width: 750 px
+.. code:: python
+
+  from sultan.api import Sultan
+  s = Sultan()
+  with Sultan.load(sudo=True) as s:
+    s.yum("install -y tree").run()
+
+**Runs:** 
+
+.. code:: bash
+  
+  sudo su - root -c 'yum install -y tree;'
 
 What if we want to install this command on a remote machine? You can easily 
 achieve this using context management:
 
-.. image:: https://raw.githubusercontent.com/aeroxis/sultan/master/docs/img/readme-3-ssh-access.png
-  :alt: Sultan's Context Manager for SSH access
-  :width: 750 px
+.. code:: python
+
+  from sultan.api import Sultan
+  
+  with Sultan.load(sudo=True, hostname="myserver.com") as sultan:
+    sultan.yum("install -y tree").run()
+
+**Runs:**
+
+.. code:: bash
+
+  ssh root@myserver.com 'sudo su - root -c 'yum install -y tree;''
 
 If you enter a wrong command, Sultan will print out details you need to debug and 
 find the problem quickly.
 
 Here, the same command was run on a Mac:
 
-.. image:: https://raw.githubusercontent.com/aeroxis/sultan/master/docs/img/readme-4-error-message.png
-  :alt: Sultan's Error Management
-  :width: 750 px
+.. code:: python
+
+  from sultan.api import Sultan
+
+  
+**Yields:**
+
+.. code:: bash
+
+  [sultan]: sudo su - root -c 'yum install -y tree;'
+  Password:
+  [sultan]: --{ STDERR }-------------------------------------------------------------------------------------------------------
+  [sultan]: | -sh: yum: command not found
+  [sultan]: -------------------------------------------------------------------------------------------------------------------
 
 Want to get started? Simply install Sultan, and start writing your clean code::
 
