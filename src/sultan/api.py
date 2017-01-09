@@ -187,9 +187,14 @@ class Sultan(Base):
                 stderr=subprocess.PIPE,
                 universal_newlines=True).communicate()
 
-            # stdout = subprocess.check_output(commands, shell=True, stderr=stderr)
             if stdout:
                 return stdout.strip().splitlines()
+
+            if stderr:
+                self.__echo.critical("--{ STDERR }---" + "-" * 100)
+                format_lines(stderr.strip().split('\n'))
+                self.__echo.critical("---------------" + "-" * 100)
+
             return stdout
 
         except Exception as e:

@@ -20,14 +20,17 @@
   :alt: Documentation Status
   :target: http://sultan.readthedocs.io/en/latest/?badge=latest
 
+Sultan now supports the following Python versions:
+
+  - "2.7"
+  - "3.3"
+  - "3.4"
+  - "3.5"
+  
 ----
 Note
 ----
-
-1. Sultan currently supports Python `2.7.x`. Version `0.3` of Sultan is 
-slated to support Python `3.0`.
-
-2. Your input is welcome! Please provide your feedback by creating 
+Your input is welcome! Please provide your feedback by creating 
 `issues on Github <https://github.com/aeroxis/sultan/issues>`_
 
 -------------
@@ -50,32 +53,69 @@ utilities using simple function calls.
 
 The simplest way to use Sultan is to just call it:
 
-.. image:: https://raw.githubusercontent.com/aeroxis/sultan/master/docs/img/readme-1-simple-usage.png
-  :alt: Sultan's Simple usage
-  :width: 750 px
+.. code:: python
+
+  from sultan.api import Sultan
+  s = Sultan()
+  s.sudo("yum install -y tree").run()
+  
+**Runs:** 
+
+.. code:: bash
+
+  sudo install -y tree;
 
 The recommended way of using Sultan is to use it in Context Management mode. 
 Here is how to use Sultan with Context Management:
 
-.. image:: https://raw.githubusercontent.com/aeroxis/sultan/master/docs/img/readme-2-context-manager.png
-  :alt: Sultan's Context Manager
-  :width: 750 px
+.. code:: python
+
+  from sultan.api import Sultan
+  s = Sultan()
+  with Sultan.load(sudo=True) as s:
+    s.yum("install -y tree").run()
+
+**Runs:** 
+
+.. code:: bash
+  
+  sudo su - root -c 'yum install -y tree;'
 
 What if we want to install this command on a remote machine? You can easily 
 achieve this using context management:
 
-.. image:: https://raw.githubusercontent.com/aeroxis/sultan/master/docs/img/readme-3-ssh-access.png
-  :alt: Sultan's Context Manager for SSH access
-  :width: 750 px
+.. code:: python
+
+  from sultan.api import Sultan
+  
+  with Sultan.load(sudo=True, hostname="myserver.com") as sultan:
+    sultan.yum("install -y tree").run()
+
+**Runs:**
+
+.. code:: bash
+
+  ssh root@myserver.com 'sudo su - root -c 'yum install -y tree;''
 
 If you enter a wrong command, Sultan will print out details you need to debug and 
 find the problem quickly.
 
 Here, the same command was run on a Mac:
 
-.. image:: https://raw.githubusercontent.com/aeroxis/sultan/master/docs/img/readme-4-error-message.png
-  :alt: Sultan's Error Management
-  :width: 750 px
+.. code:: python
+
+  from sultan.api import Sultan
+
+  
+**Yields:**
+
+.. code:: bash
+
+  [sultan]: sudo su - root -c 'yum install -y tree;'
+  Password:
+  [sultan]: --{ STDERR }-------------------------------------------------------------------------------------------------------
+  [sultan]: | -sh: yum: command not found
+  [sultan]: -------------------------------------------------------------------------------------------------------------------
 
 Want to get started? Simply install Sultan, and start writing your clean code::
 
