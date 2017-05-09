@@ -26,12 +26,12 @@ setup(
         "Operating System :: MacOS :: MacOS X",
         "Programming Language :: Python",
         "Programming Language :: Python :: 2",
-        "Programming Language :: Python :: 2.3",
-        "Programming Language :: Python :: 2.4",
-        "Programming Language :: Python :: 2.5",
-        "Programming Language :: Python :: 2.6",
         "Programming Language :: Python :: 2.7",
-        "Programming Language :: Python :: 2 :: Only",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.3",
+        "Programming Language :: Python :: 3.4",
+        "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.6",
         "Programming Language :: Unix Shell",
         "License :: OSI Approved :: MIT License"]
 )
