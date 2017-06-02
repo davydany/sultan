@@ -76,12 +76,13 @@ class Sultan(Base):
     _context = None
 
     @classmethod
-    def load(cls, cwd=None, sudo=False, user=None, hostname=None, **kwargs):
+    def load(cls, cwd=None, sudo=False, user=None, hostname=None, env=None, **kwargs):
 
         context = {}
         context['cwd'] = cwd
         context['sudo'] = sudo
         context['hostname'] = hostname
+        context['env'] = env or {}
 
         # determine user
         if user:
@@ -179,9 +180,12 @@ class Sultan(Base):
             self.__echo.cmd(commands)
 
         stdout, stderr = None, None
+        env = self._context[0].get('env', {}) if len(self._context) > 0 else {}
+
         try:
             stdout, stderr = subprocess.Popen(commands,
                 shell=True,
+                env=env,
                 stdin=subprocess.PIPE,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
