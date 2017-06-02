@@ -106,6 +106,11 @@ class SultanTestCase(unittest.TestCase):
         sultan = Sultan()
         self.assertEqual(str(sultan.touch("/tmp/foo").and_().touch("/tmp/bar")), "touch /tmp/foo && touch /tmp/bar;")
 
+    def test_or(self):
+
+        sultan = Sultan()
+        self.assertEqual(str(sultan.touch('/tmp/foobar').or_().echo('"Step Completed"')), "touch /tmp/foobar || echo \"Step Completed\";")
+
     @mock.patch('sultan.api.input')
     def test_stdin(self, mock_input):
 
@@ -116,25 +121,29 @@ class SultanTestCase(unittest.TestCase):
     def test_calling_context(self):
 
         sultan = Sultan.load(cwd='/tmp', test_key='test_val')
-        self.assertEqual(sultan.current_context, { 'cwd': '/tmp', 'sudo': False, 'test_key': 'test_val', 'user': getpass.getuser(), 'hostname': None })
+        self.assertEqual(sultan.current_context, { 'cwd': '/tmp', 'env': {}, 'sudo': False, 'test_key': 'test_val', 'user': getpass.getuser(), 'hostname': None })
 
         # cwd
         with Sultan.load(cwd='/tmp') as sultan:
-            self.assertEqual(sultan.current_context, { 'cwd': '/tmp', 'sudo': False, 'user': getpass.getuser(), 'hostname': None })
+            self.assertEqual(sultan.current_context, { 'cwd': '/tmp', 'env': {}, 'sudo': False, 'user': getpass.getuser(), 'hostname': None })
 
         # sudo
         with Sultan.load(cwd='/tmp', sudo=True) as sultan:
-            self.assertEqual(sultan.current_context, { 'cwd': '/tmp', 'sudo': True, 'user': 'root', 'hostname': None })
+            self.assertEqual(sultan.current_context, { 'cwd': '/tmp', 'env': {}, 'sudo': True, 'user': 'root', 'hostname': None })
 
         with Sultan.load(cwd='/tmp', sudo=False, user="hodor") as sultan:
-            self.assertEqual(sultan.current_context, { 'cwd': '/tmp', 'sudo': False, 'user': 'hodor', 'hostname': None })
+            self.assertEqual(sultan.current_context, { 'cwd': '/tmp', 'env': {}, 'sudo': False, 'user': 'hodor', 'hostname': None })
 
         with Sultan.load(sudo=True) as sultan:
-            self.assertEqual(sultan.current_context, { 'cwd': None, 'sudo': True, 'user': 'root', 'hostname': None })
+            self.assertEqual(sultan.current_context, { 'cwd': None, 'env': {}, 'sudo': True, 'user': 'root', 'hostname': None })
 
         # hostname
         with Sultan.load(hostname='localhost') as sultan:
-            self.assertEqual(sultan.current_context, { 'cwd': None, 'sudo': False, 'user': getpass.getuser(), 'hostname': 'localhost' })
+            self.assertEqual(sultan.current_context, { 'cwd': None, 'env': {}, 'sudo': False, 'user': getpass.getuser(), 'hostname': 'localhost' })
+        
+        # set environment
+        with Sultan.load(env={ 'path' : '' }) as sultan:
+            self.assertEqual(sultan.current_context, { 'cwd': None, 'env': { 'path': '' }, 'sudo': False, 'user': getpass.getuser(), 'hostname': None })
 
     def test_context_for_pwd(self):
 

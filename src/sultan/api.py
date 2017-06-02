@@ -76,12 +76,13 @@ class Sultan(Base):
     _context = None
 
     @classmethod
-    def load(cls, cwd=None, sudo=False, user=None, hostname=None, **kwargs):
+    def load(cls, cwd=None, sudo=False, user=None, hostname=None, env=None, **kwargs):
 
         context = {}
         context['cwd'] = cwd
         context['sudo'] = sudo
         context['hostname'] = hostname
+        context['env'] = env or {}
 
         # determine user
         if user:
@@ -179,9 +180,12 @@ class Sultan(Base):
             self.__echo.cmd(commands)
 
         stdout, stderr = None, None
+        env = self._context[0].get('env', {}) if len(self._context) > 0 else {}
+
         try:
             stdout, stderr = subprocess.Popen(commands,
                 shell=True,
+                env=env,
                 stdin=subprocess.PIPE,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
@@ -250,7 +254,7 @@ class Sultan(Base):
         Returns the chained commands that were built as a string.
         """
         context = self.current_context
-        SPECIAL_CASES = (Pipe, And, Redirect)
+        SPECIAL_CASES = (Pipe, And, Redirect, Or)
         output = ""
         for i, cmd in enumerate(self.commands):
 
@@ -323,6 +327,19 @@ class Sultan(Base):
             s.cd("/tmp").and_().touch("foobar.txt").run()
         """
         self._add(And(self, "&&"))
+        return self
+
+    def or_(self):
+        """
+        Combines multiple commands using `||`.
+
+        Usage::
+
+            # runs: 'touch /tmp/foobar || echo "Step Completed"'
+            s = Sultan()
+            s.touch('/tmp/foobar').or_().echo("Step Completed").run()
+        """
+        self._add(Or(self, '||'))
         return self
 
     def stdin(self, message):
@@ -414,6 +431,18 @@ class Pipe(BaseCommand):
 class And(BaseCommand):
     """
     Representation of the And `&&` operator.
+    """
+    def __call__(self):
+
+        pass # do nothing
+
+    def __str__(self):
+
+        return self.command
+
+class Or(BaseCommand):
+    """
+    Representation of the Or `||` operator.
     """
     def __call__(self):
 

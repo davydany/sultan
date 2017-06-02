@@ -27,6 +27,18 @@ class SultanCreateFileTestCase(unittest.TestCase):
         with open(self.path) as f:
             self.assertEqual(f.read(), 'ls -lah /tmp\n')
 
+class SultanEnvironment(unittest.TestCase):
+    """
+    Tests if Sultan can set environment variables.
+    """
+
+    def test_environment_setup(self):
+
+        with Sultan.load(env={ 'FOOBAR': '/tmp' }) as s:
+
+            response = s.env().run()
+            self.assertIn('FOOBAR=/tmp', response)
+
 class SultanRunCustomScripts(unittest.TestCase):
     """
     Run a custom script that we create
