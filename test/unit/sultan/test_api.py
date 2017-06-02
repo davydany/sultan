@@ -106,6 +106,11 @@ class SultanTestCase(unittest.TestCase):
         sultan = Sultan()
         self.assertEqual(str(sultan.touch("/tmp/foo").and_().touch("/tmp/bar")), "touch /tmp/foo && touch /tmp/bar;")
 
+    def test_or(self):
+
+        sultan = Sultan()
+        self.assertEqual(str(sultan.touch('/tmp/foobar').or_().echo('"Step Completed"')), "touch /tmp/foobar || echo \"Step Completed\";")
+
     @mock.patch('sultan.api.input')
     def test_stdin(self, mock_input):
 

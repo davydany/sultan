@@ -250,7 +250,7 @@ class Sultan(Base):
         Returns the chained commands that were built as a string.
         """
         context = self.current_context
-        SPECIAL_CASES = (Pipe, And, Redirect)
+        SPECIAL_CASES = (Pipe, And, Redirect, Or)
         output = ""
         for i, cmd in enumerate(self.commands):
 
@@ -323,6 +323,19 @@ class Sultan(Base):
             s.cd("/tmp").and_().touch("foobar.txt").run()
         """
         self._add(And(self, "&&"))
+        return self
+
+    def or_(self):
+        """
+        Combines multiple commands using `||`.
+
+        Usage::
+
+            # runs: 'touch /tmp/foobar || echo "Step Completed"'
+            s = Sultan()
+            s.touch('/tmp/foobar').or_().echo("Step Completed").run()
+        """
+        self._add(Or(self, '||'))
         return self
 
     def stdin(self, message):
@@ -414,6 +427,18 @@ class Pipe(BaseCommand):
 class And(BaseCommand):
     """
     Representation of the And `&&` operator.
+    """
+    def __call__(self):
+
+        pass # do nothing
+
+    def __str__(self):
+
+        return self.command
+
+class Or(BaseCommand):
+    """
+    Representation of the Or `||` operator.
     """
     def __call__(self):
 
