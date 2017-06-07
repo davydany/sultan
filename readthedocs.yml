@@ -1,0 +1,6 @@
+---
+formats:
+  - htmlzip
+  - epub
+  - pdf
+requirements: docs/requirements.txt

@@ -160,10 +160,10 @@ html_theme_options = {
     'fixed_sidebar': True,
     'font_size': '14px',
     'font_family': ','.join([
-        'Consolas', 
-        'Menlo', 
-        'Deja Vu Sans Mono', 
-        'Bitstream Vera Sans Mono', 
+        'Consolas',
+        'Menlo',
+        'Deja Vu Sans Mono',
+        'Bitstream Vera Sans Mono',
         'monospace']),
 }
 
