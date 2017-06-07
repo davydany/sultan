@@ -1,14 +1,16 @@
 
 .. image:: img/sultan-logo.png
     :alt: Sultan logo
-    :align: right
+    :align: center
+-------------------------------
+
+**Command and Rule Over Your Shell**
+
+-------------------------------
 
 ======
 Sultan
 ======
-
-**Command and Rule over your Shell**
-
 .. automodule:: sultan.api
 
 .. toctree::
@@ -20,10 +22,7 @@ Sultan
     faq
     sultan-examples
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-
+-------------------------------
 
 ---------------
 What is Sultan?

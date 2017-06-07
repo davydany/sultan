@@ -56,7 +56,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'Sultan'
-copyright = u'2016, Aeroxis, LLC'
+copyright = u'2017, Aeroxis, LLC'
 author = u'Aeroxis, LLC'
 
 
@@ -83,7 +83,7 @@ release = u'.'.join([MAJOR, MINOR, RELEASE])
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+language = 'en'
 
 # There are two options for replacing |today|: either, you set today to some
 # non-false value, then it is used:
@@ -147,10 +147,23 @@ html_theme = 'alabaster'
 # documentation.
 #
 html_theme_options = {
+    'logo': 'sultan-logo.png',
+    'logo_name': 'foobar',
     'github_banner': True,
     'github_user': 'aeroxis',
     'github_repo': 'sultan',
-    'logo': 'sultan-logo.png'
+    'logo': 'sultan-logo.png',
+    'github_button': True,
+    'github_count': True,
+    'sidebar_includehidden': True,
+    'show_related': True,
+    'font_size': '14px',
+    'font_family': ','.join([
+        'Consolas', 
+        'Menlo', 
+        'Deja Vu Sans Mono', 
+        'Bitstream Vera Sans Mono', 
+        'monospace']),
 }
 
 # Add any paths that contain custom themes here, relative to this directory.

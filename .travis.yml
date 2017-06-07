@@ -7,7 +7,9 @@ python:
   - "3.6"
 install:
 - pip install -r requirements/test.txt
-script: make tests
+script: 
+  - make tests
+  - cd docs && make html
 deploy:
   provider: pypi
   distributions: bdist_wheel
