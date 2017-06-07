@@ -55,14 +55,23 @@ Suppose we want to cat out the contents of `/etc/hosts`, we'd do the following::
     with Sultan.load(cwd="/etc") as s:
         s.cat("hosts").run()
 
-Example 3: Compounding with And (&&)
-------------------------------------
+Example 3: Compounding with And (&&) and Or (||)
+------------------------------------------------
 
 There are times when we need multiple commands to run at once. We use the 
 `and_()` command to get through this. Here is an example::
 
     # runs: 'cd /tmp && touch foobar.txt'
-    s.cd("/tmp").and_().touch("foobar.txt").run()
+    with Sultan.load() as s:
+        s.cd("/tmp").and_().touch("foobar.txt").run()
+
+There are also times that we want to run 2 commands, but run the 2nd command 
+even if the first command fails. For this, you will need to use the `or_()`
+command. Here is an example::
+
+    # runs: 'mkdir /tmp || mkdir /bar'
+    with Sultan.load() as s:
+        s.mkdir('/tmp').or_().mkdir('/bar').run()
 
 Example 4: Redirecting with Pipes (|)
 -------------------------------------
@@ -72,7 +81,8 @@ command to another command. We do this in Sultan with the `pipe` command. Here
 is an example::
 
     # runs: 'ls -l | sed -e "s/[aeio]/u/g"'
-    s.ls('-l').pipe().sed('-e', '"s/[aeio]/u/g"').run()
+    with Sultan.load() as s:
+        s.ls('-l').pipe().sed('-e', '"s/[aeio]/u/g"').run()
 
 Example 5: Redirecting Output to File
 -------------------------------------
@@ -82,11 +92,12 @@ the output is in `stdout` or `stderr`, we can redirect it to a file with
 Sultan. Here is an example::
 
     # runs: 'cat /etc/hosts > ~/hosts'
-    s.cat("/etc/hosts").redirect(
-        "~/hosts", 
-        append=False, 
-        stdout=True, 
-        stderr=False)
+    with Sultan.load() as s:
+        s.cat("/etc/hosts").redirect(
+            "~/hosts", 
+            append=False, 
+            stdout=True, 
+            stderr=False).run()
 
 In the example above, we redirected the output of `/etc/hosts` to `~/hosts`. 
 We only outputted the `stdout`, and didn't append to the file if it existed.
@@ -114,7 +125,7 @@ Here is an example::
 
     # runs: sudo su - hodor -c 'cd /home/hodor && ls -lah .;'
     with Sultan.load(sudo=True, user='hodor', cwd='/home/hodor') as s:
-        sultan.ls('-lah', '.')
+        sultan.ls('-lah', '.').run()
 
 Example 8: Running as Root
 --------------------------
@@ -126,4 +137,16 @@ Here is an example::
 
     # runs: sudo su - root -c 'ls -lah /root;'
     with Sultan.load(sudo=True) as sultan:
-        sultan.ls('-lah', '/root')
+        sultan.ls('-lah', '/root').run()
+
+Example 9: Disable Logging
+--------------------------
+
+If you need to disable logging all together, simply add set 'logging' to False 
+while loading Sultan with Context.
+
+Here is an example::
+
+    # runs without logging
+    with Sultan.load(logging=False) as sultan:
+        sultan.ls('-lah', '/tmp').run()

@@ -18,42 +18,52 @@ def getLogger(name='', level=logging.DEBUG):
 
 class Echo(Base):
 
-    def __init__(self):
+    def __init__(self, activated=True):
 
         self.logger = getLogger(name='sultan')
+        self.activated = activated
 
     def log(self, msg):
 
-        self.logger.info(msg)
+        if self.activated:
+            self.logger.info(msg)
 
     def cmd(self, msg):
 
-        self.logger.debug(msg)
+        if self.activated:
+            self.logger.debug(msg)
 
     def stdout(self, msg):
 
-        self.logger.info(msg)
+        if self.activated:
+            self.logger.info(msg)
 
     def stderr(self, msg):
 
-        self.logger.critical(msg)
+        if self.activated:
+            self.logger.critical(msg)
 
     def debug(self, msg):
 
-        self.logger.debug(msg)
+        if self.activated:
+            self.logger.debug(msg)
 
     def info(self, msg):
 
-        self.logger.info(msg)
+        if self.activated:
+            self.logger.info(msg)
 
     def warn(self, msg):
 
-        self.logger.warning(msg)
+        if self.activated:
+            self.logger.warning(msg)
 
     def error(self, msg):
 
-        self.logger.error(msg)
+        if self.activated:
+            self.logger.error(msg)
 
     def critical(self, msg):
 
-        self.logger.critical(msg)
+        if self.activated:
+            self.logger.critical(msg)
