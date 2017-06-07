@@ -66,7 +66,7 @@ Here is how to use Sultan with Context Management:
 .. code:: python
 
   from sultan.api import Sultan
-  s = Sultan()
+
   with Sultan.load(sudo=True) as s:
     s.yum("install -y tree").run()
 

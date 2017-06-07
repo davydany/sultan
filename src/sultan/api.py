@@ -76,13 +76,14 @@ class Sultan(Base):
     _context = None
 
     @classmethod
-    def load(cls, cwd=None, sudo=False, user=None, hostname=None, env=None, **kwargs):
+    def load(cls, cwd=None, sudo=False, user=None, hostname=None, env=None, logging=True, **kwargs):
 
         context = {}
         context['cwd'] = cwd
         context['sudo'] = sudo
         context['hostname'] = hostname
         context['env'] = env or {}
+        context['logging'] = logging
 
         # determine user
         if user:
@@ -96,8 +97,10 @@ class Sultan(Base):
 
     def __init__(self, context=None):
 
+        context = {} if not context else context
         self.commands = []
-        self.__echo = Echo()
+        self.logging_activated = context.get('logging')
+        self._echo = Echo(activated=self.logging_activated)
         self.settings = Settings()
 
         if context:
@@ -170,14 +173,14 @@ class Sultan(Base):
         """
         def format_lines(lines):
             for line in lines:
-                self.__echo.error(format_line(line))
+                self._echo.error(format_line(line))
 
         def format_line(msg):
             return "| %s" % msg
 
         commands = str(self)
         if not (quiet or q):
-            self.__echo.cmd(commands)
+            self._echo.cmd(commands)
 
         stdout, stderr = None, None
         env = self._context[0].get('env', {}) if len(self._context) > 0 else {}
@@ -195,33 +198,33 @@ class Sultan(Base):
                 return stdout.strip().splitlines()
 
             if stderr:
-                self.__echo.critical("--{ STDERR }---" + "-" * 100)
+                self._echo.critical("--{ STDERR }---" + "-" * 100)
                 format_lines(stderr.strip().split('\n'))
-                self.__echo.critical("---------------" + "-" * 100)
+                self._echo.critical("---------------" + "-" * 100)
 
             return stdout
 
         except Exception as e:
             tb = traceback.format_exc().split("\n")
 
-            self.__echo.critical("Unable to run '%s'" % commands)
+            self._echo.critical("Unable to run '%s'" % commands)
 
             #traceback
-            self.__echo.critical("--{ TRACEBACK }" + "-" * 100)
+            self._echo.critical("--{ TRACEBACK }" + "-" * 100)
             format_lines(tb)
-            self.__echo.critical("---------------" + "-" * 100)
+            self._echo.critical("---------------" + "-" * 100)
 
             # standard out
             if stdout:
-                self.__echo.critical("--{ STDOUT }---" + "-" * 100)
+                self._echo.critical("--{ STDOUT }---" + "-" * 100)
                 format_lines(stdout)
-                self.__echo.critical("---------------" + "-" * 100)
+                self._echo.critical("---------------" + "-" * 100)
 
             # standard error
             if stderr:
-                self.__echo.critical("--{ STDERR }---" + "-" * 100)
+                self._echo.critical("--{ STDERR }---" + "-" * 100)
                 format_lines(stderr)
-                self.__echo.critical("---------------" + "-" * 100)
+                self._echo.critical("---------------" + "-" * 100)
 
             if self.settings.HALT_ON_ERROR:
                 if halt_on_nonzero:
@@ -301,7 +304,7 @@ class Sultan(Base):
         """
         Logs to the logger the command.
         """
-        self.__echo.log(str(self))
+        self._echo.log(str(self))
 
     def pipe(self):
         """
