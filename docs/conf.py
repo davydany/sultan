@@ -59,6 +59,8 @@ project = u'Sultan'
 copyright = u'2016, Aeroxis, LLC'
 author = u'Aeroxis, LLC'
 
+
+
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
 # built documents.
@@ -144,7 +146,12 @@ html_theme = 'alabaster'
 # further.  For a list of options available for each theme, see the
 # documentation.
 #
-# html_theme_options = {}
+html_theme_options = {
+    'github_banner': True,
+    'github_user': 'aeroxis',
+    'github_repo': 'sultan',
+    'logo': 'sultan-logo.png'
+}
 
 # Add any paths that contain custom themes here, relative to this directory.
 # html_theme_path = []

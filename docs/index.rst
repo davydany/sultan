@@ -87,6 +87,9 @@ Here, the same command was run on a Mac:
 .. code:: python
 
   from sultan.api import Sultan
+  
+  with Sultan.load(sudo=True, hostname="myserver.com") as sultan:
+    sultan.yum("install -y tree").run()
 
   
 **Yields:**
@@ -103,5 +106,5 @@ Want to get started? Simply install Sultan, and start writing your clean code::
 
     pip install --upgrade sultan
 
-If you have more questions, check the docs! http://sultan.readthedocs.io/en/latest/
-
+If you have more questions, check the rest of the docs, or reach out at 
+Github: https://github.com/aeroxis/sultan

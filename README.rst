@@ -100,6 +100,9 @@ Here, the same command was run on a Mac:
 .. code:: python
 
   from sultan.api import Sultan
+  
+  with Sultan.load(sudo=True, hostname="myserver.com") as sultan:
+    sultan.yum("install -y tree").run()
 
   
 **Yields:**
