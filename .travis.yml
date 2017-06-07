@@ -7,6 +7,7 @@ python:
   - "3.6"
 install:
 - pip install -r requirements/test.txt
+- pip install -r docs/requirements.txt
 script: 
   - make tests
   - cd docs && make html
