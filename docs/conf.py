@@ -157,6 +157,7 @@ html_theme_options = {
     'github_count': True,
     'sidebar_includehidden': True,
     'show_related': True,
+    'fixed_sidebar': True,
     'font_size': '14px',
     'font_family': ','.join([
         'Consolas', 
