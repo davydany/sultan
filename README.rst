@@ -58,7 +58,7 @@ The simplest way to use Sultan is to just call it:
 
 .. code:: bash
 
-  sudo install -y tree;
+  sudo yum install -y tree;
 
 The recommended way of using Sultan is to use it in Context Management mode. 
 Here is how to use Sultan with Context Management:
