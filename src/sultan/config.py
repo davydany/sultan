@@ -14,8 +14,8 @@ DEFAULT_SETTINGS = {
     }
 }
 
-class Settings(Base):
 
+class Settings(Base):
 
     def __getattribute__(self, attr):
 
@@ -31,5 +31,6 @@ class Settings(Base):
             return settings[attr]
         else:
             ValueError("Invalid Setting '%s'." % (attr))
+
 
 settings = Settings()

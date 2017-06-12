@@ -1,3 +1,2 @@
 class InvalidContextError(Exception):
-
     pass
