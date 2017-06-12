@@ -16,6 +16,7 @@ def getLogger(name='', level=logging.DEBUG):
     logger.setLevel(level)
     return logger
 
+
 class Echo(Base):
 
     def __init__(self, activated=True):

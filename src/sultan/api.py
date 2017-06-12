@@ -54,7 +54,6 @@ If you have more questions, check the docs! http://sultan.readthedocs.io/en/late
 import getpass
 import os
 import subprocess
-import tempfile
 import traceback
 import sys
 
@@ -68,12 +67,11 @@ __all__ = ['Sultan']
 if sys.version_info < (3, 0):
     input = raw_input
 
+
 class Sultan(Base):
     """
     The Pythonic interface to Bash.
     """
-    commands = None
-    _context = None
 
     @classmethod
     def load(cls, cwd=None, sudo=False, user=None, hostname=None, env=None, logging=True, **kwargs):
@@ -92,24 +90,15 @@ class Sultan(Base):
             context['user'] = 'root' if sudo else getpass.getuser()
         context.update(kwargs)
 
-        s = Sultan(context=context)
-        return s
+        return cls(context=context)
 
     def __init__(self, context=None):
 
-        context = {} if not context else context
         self.commands = []
-        self.logging_activated = context.get('logging')
+        self._context = [context] if context is not None else []
+        self.logging_activated = context.get('logging') if context else False
         self._echo = Echo(activated=self.logging_activated)
         self.settings = Settings()
-
-        if context:
-            if self._context:
-                self._context.append(context)
-            else:
-                self._context = [context]
-        else:
-            self._context = []
 
     @property
     def current_context(self):
@@ -187,12 +176,12 @@ class Sultan(Base):
 
         try:
             stdout, stderr = subprocess.Popen(commands,
-                shell=True,
-                env=env,
-                stdin=subprocess.PIPE,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                universal_newlines=True).communicate()
+                                              shell=True,
+                                              env=env,
+                                              stdin=subprocess.PIPE,
+                                              stdout=subprocess.PIPE,
+                                              stderr=subprocess.PIPE,
+                                              universal_newlines=True).communicate()
 
             if stdout:
                 return stdout.strip().splitlines()
@@ -204,12 +193,12 @@ class Sultan(Base):
 
             return stdout
 
-        except Exception as e:
+        except Exception:
             tb = traceback.format_exc().split("\n")
 
             self._echo.critical("Unable to run '%s'" % commands)
 
-            #traceback
+            #  traceback
             self._echo.critical("--{ TRACEBACK }" + "-" * 100)
             format_lines(tb)
             self._echo.critical("---------------" + "-" * 100)
@@ -267,7 +256,7 @@ class Sultan(Base):
                 if type(cmd) in SPECIAL_CASES:
                     separator = " "
                 else:
-                    if type(self.commands[i-1]) in SPECIAL_CASES:
+                    if type(self.commands[i - 1]) in SPECIAL_CASES:
                         separator = " "
                     else:
                         separator = "; "
@@ -368,6 +357,7 @@ class BaseCommand(Base):
         self.kwargs = {}
         self.context = context if context else {}
 
+
 class Command(BaseCommand):
     """
     The class that all commands are based off. Essentially, when we run
@@ -389,7 +379,7 @@ class Command(BaseCommand):
             self.command = os.path.join(where, cmd)
 
         if "sudo" in kwargs:
-            sudo = kwargs.pop("sudo")
+            kwargs.pop("sudo")
             self.command = "sudo " + self.command
 
         self.args = [str(a) for a in args]
@@ -414,10 +404,13 @@ class Command(BaseCommand):
 
         # prep and return the output
         output = self.command
-        if len(kwargs_str) > 0: output = output + " " + kwargs_str
-        if len(args_str) > 0: output = output + " " + args_str
+        if len(kwargs_str) > 0:
+            output += " " + kwargs_str
+        if len(args_str) > 0:
+            output += " " + args_str
 
         return output
+
 
 class Pipe(BaseCommand):
     """
@@ -425,11 +418,12 @@ class Pipe(BaseCommand):
     """
     def __call__(self):
 
-        pass # do nothing
+        pass  # do nothing
 
     def __str__(self):
 
         return self.command
+
 
 class And(BaseCommand):
     """
@@ -437,11 +431,12 @@ class And(BaseCommand):
     """
     def __call__(self):
 
-        pass # do nothing
+        pass  # do nothing
 
     def __str__(self):
 
         return self.command
+
 
 class Or(BaseCommand):
     """
@@ -449,11 +444,12 @@ class Or(BaseCommand):
     """
     def __call__(self):
 
-        pass # do nothing
+        pass  # do nothing
 
     def __str__(self):
 
         return self.command
+
 
 class Redirect(BaseCommand):
     """
