@@ -1,4 +1,4 @@
-__doc__ = """
+"""
 Sultan is a Python package for interfacing with command-line utilities, like
 `yum`, `apt-get`, or `ls`, in a Pythonic manner. It lets you run command-line
 utilities using simple function calls.
@@ -59,7 +59,7 @@ import sys
 
 from .core import Base
 from .config import Settings
-from .err import InvalidContextError
+from .exceptions import InvalidContextError
 from .echo import Echo
 
 __all__ = ['Sultan']
@@ -253,10 +253,10 @@ class Sultan(Base):
             if (i == 0):
                 separator = ""
             else:
-                if type(cmd) in SPECIAL_CASES:
+                if isinstance(cmd, SPECIAL_CASES):
                     separator = " "
                 else:
-                    if type(self.commands[i - 1]) in SPECIAL_CASES:
+                    if isinstance(self.commands[i - 1], SPECIAL_CASES):
                         separator = " "
                     else:
                         separator = "; "

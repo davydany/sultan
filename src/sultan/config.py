@@ -1,4 +1,3 @@
-import copy
 import os
 from .core import Base
 
@@ -15,22 +14,27 @@ DEFAULT_SETTINGS = {
 }
 
 
+SULTAN_SETTINGS_MODULE_ENV = 'SULTAN_SETTINGS_MODULE'
+
+
 class Settings(Base):
 
-    def __getattribute__(self, attr):
+    def __init__(self):
+        super(Settings, self).__init__()
+        self._settings = DEFAULT_SETTINGS.copy()
+        self._load_setting_module()
 
-        sultan_settings_module_env = 'SULTAN_SETTINGS_MODULE'
-        settings = copy.deepcopy(DEFAULT_SETTINGS)
-        if sultan_settings_module_env in os.environ:
-
-            settings = __import__(os.environ[sultan_settings_module_env])
+    def _load_setting_module(self):
+        if SULTAN_SETTINGS_MODULE_ENV in os.environ:
+            settings = __import__(os.environ[SULTAN_SETTINGS_MODULE_ENV])
             for k, v in settings.items():
-                settings[k] = v
+                self._settings[k] = v
 
-        if attr in settings:
-            return settings[attr]
-        else:
-            ValueError("Invalid Setting '%s'." % (attr))
+    def __getattr__(self, attr):
+        try:
+            return self._settings[attr]
+        except KeyError:
+            raise ValueError("Invalid Setting '%s'." % (attr))
 
 
 settings = Settings()
