@@ -8,8 +8,7 @@ import getpass
 
 from sultan.api import And, Or, Command, Pipe, Redirect, Sultan
 from sultan.config import Settings
-from sultan.echo import Echo
-from sultan.err import InvalidContextError
+from sultan.exceptions import InvalidContextError
 
 
 class SultanTestCase(unittest.TestCase):
