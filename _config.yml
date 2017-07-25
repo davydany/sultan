@@ -1,0 +1,8 @@
+title: Sultan
+description: Command and Rule over your Shell
+google_analytics: 
+show_downloads: true
+theme: jekyll-theme-cayman
+
+gems:
+  - jekyll-mentions
