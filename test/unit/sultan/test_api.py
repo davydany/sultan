@@ -127,36 +127,100 @@ class SultanTestCase(unittest.TestCase):
     def test_calling_context(self):
 
         sultan = Sultan.load(cwd='/tmp', test_key='test_val')
-        self.assertEqual(sultan.current_context, {'cwd': '/tmp', 'env': {}, 'sudo': False,
-                                                  'logging': True, 'test_key': 'test_val', 'user': getpass.getuser(), 'hostname': None})
+        self.assertEqual(sultan.current_context, {
+            'cwd': '/tmp',
+            'env': {},
+            'sudo': False,
+            'logging': True,
+            'test_key': 'test_val',
+            'user': getpass.getuser(),
+            'hostname': None,
+            'port': '22'
+        })
 
         # cwd
         with Sultan.load(cwd='/tmp') as sultan:
             self.assertEqual(sultan.current_context, {
-                             'cwd': '/tmp', 'env': {}, 'sudo': False, 'logging': True, 'user': getpass.getuser(), 'hostname': None})
+                'cwd': '/tmp', 
+                'env': {}, 
+                'sudo': False, 
+                'logging': True, 
+                'user': getpass.getuser(), 
+                'hostname': None,
+                'port': '22'
+            })
 
         # sudo
         with Sultan.load(cwd='/tmp', sudo=True) as sultan:
             self.assertEqual(sultan.current_context, {
-                             'cwd': '/tmp', 'env': {}, 'sudo': True, 'logging': True, 'user': getpass.getuser(), 'hostname': None})
+                'cwd': '/tmp', 
+                'env': {}, 
+                'sudo': True, 
+                'logging': True, 
+                'user': getpass.getuser(), 
+                'hostname': None,
+                'port': '22'
+            })
 
         with Sultan.load(cwd='/tmp', sudo=False, user="hodor") as sultan:
             self.assertEqual(sultan.current_context, {
-                             'cwd': '/tmp', 'env': {}, 'sudo': False, 'logging': True, 'user': 'hodor', 'hostname': None})
+                'cwd': '/tmp', 
+                'env': {}, 
+                'sudo': False, 
+                'logging': True, 
+                'user': 'hodor', 
+                'hostname': None,
+                'port': '22'
+            })
 
         with Sultan.load(sudo=True) as sultan:
-            self.assertEqual(sultan.current_context, {'cwd': None, 'env': {
-            }, 'sudo': True, 'logging': True, 'user': getpass.getuser(), 'hostname': None})
+            
+            self.assertEqual(sultan.current_context, {
+                'cwd': None, 
+                'env': {}, 
+                'sudo': True, 
+                'logging': True, 
+                'user': getpass.getuser(), 
+                'hostname': None,
+                'port': '22'
+            })
 
         # hostname
         with Sultan.load(hostname='localhost') as sultan:
-            self.assertEqual(sultan.current_context, {'cwd': None, 'env': {
-            }, 'sudo': False, 'logging': True, 'user': getpass.getuser(), 'hostname': 'localhost'})
+            
+            self.assertEqual(sultan.current_context, {
+                'cwd': None, 
+                'env': {}, 
+                'sudo': False, 
+                'logging': True, 
+                'user': getpass.getuser(), 
+                'hostname': 'localhost',
+                'port': '22'
+            })
 
         # set environment
         with Sultan.load(env={'path': ''}) as sultan:
-            self.assertEqual(sultan.current_context, {'cwd': None, 'env': {
-                             'path': ''}, 'sudo': False, 'logging': True, 'user': getpass.getuser(), 'hostname': None})
+            self.assertEqual(sultan.current_context, {
+                'cwd': None, 
+                'env': {'path': ''}, 
+                'sudo': False, 
+                'logging': True, 
+                'user': getpass.getuser(), 
+                'hostname': None,
+                'port': '22'
+            })
+
+        # set port
+        with Sultan.load(port='2222') as sultan:
+            self.assertEqual(sultan.current_context, {
+                'cwd': None,
+                'env': {},
+                'sudo': False,
+                'logging': True,
+                'user': getpass.getuser(),
+                'hostname': None,
+                'port': '2222'
+            })
 
     def test_context_for_pwd(self):
 
@@ -171,7 +235,8 @@ class SultanTestCase(unittest.TestCase):
 
         # sudo as current user
         with Sultan.load(sudo=True) as sultan:
-            self.assertEqual(str(sultan.ls('-lah', '/root')), 'sudo ls -lah /root;')
+            self.assertEqual(str(sultan.ls('-lah', '/root')),
+                             'sudo ls -lah /root;')
 
         # sudo as another user
         with Sultan.load(sudo=True, user='hodor') as sultan:
@@ -189,25 +254,31 @@ class SultanTestCase(unittest.TestCase):
         with Sultan.load(hostname='google.com') as sultan:
             user = getpass.getuser()
             self.assertEqual(str(sultan.ls("-lah", "/home")),
-                             "ssh %s@google.com 'ls -lah /home;'" % user)
+                             "ssh -p 22 %s@google.com 'ls -lah /home;'" % user)
 
         # local user
         with Sultan.load(hostname='google.com', user=getpass.getuser()) as sultan:
             user = getpass.getuser()
             self.assertEqual(str(sultan.ls("-lah", "/home")),
-                             "ssh %s@google.com 'ls -lah /home;'" % user)
+                             "ssh -p 22 %s@google.com 'ls -lah /home;'" % user)
 
         # different user
         with Sultan.load(hostname='google.com', user="obama") as sultan:
             user = "obama"
             self.assertEqual(str(sultan.ls("-lah", "/home")),
-                             "ssh %s@google.com 'ls -lah /home;'" % user)
+                             "ssh -p 22 %s@google.com 'ls -lah /home;'" % user)
 
         # different user as sudo
         with Sultan.load(hostname='google.com', user="obama", sudo=True) as sultan:
             user = "obama"
             self.assertEqual(str(sultan.ls("-lah", "/home")),
-                             "ssh %s@google.com 'sudo su - obama -c \'ls -lah /home;\''" % user)
+                             "ssh -p 22 %s@google.com 'sudo su - obama -c \'ls -lah /home;\''" % user)
+
+        # different port and different user as sudo
+        with Sultan.load(hostname='google.com', user='obama', sudo=True, port=2345) as sultan:
+            user = 'obama'
+            self.assertEqual(str(sultan.ls('-lah', '/home')),
+                            "ssh -p 2345 %s@google.com 'sudo su - obama -c \'ls -lah /home;\''" % user)
 
     def test_calling_context_wrongly(self):
 
@@ -227,7 +298,9 @@ class SultanTestCase(unittest.TestCase):
     def test_dashes(self):
 
         with Sultan.load() as s:
-            self.assertEqual(str(s.apt__get('install', 'httpd')), 'apt-get install httpd;')
+            self.assertEqual(str(s.apt__get('install', 'httpd')),
+                             'apt-get install httpd;')
+
 
 class SultanCommandTestCase(unittest.TestCase):
 
@@ -262,6 +335,7 @@ class AndTestCase(unittest.TestCase):
         r = And(s, '&')
         self.assertEqual(r.command, "&")
         self.assertEqual(str(r.command), "&")
+
 
 class OrTestCommand(unittest.TestCase):
 

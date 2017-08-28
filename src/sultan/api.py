@@ -74,12 +74,13 @@ class Sultan(Base):
     """
 
     @classmethod
-    def load(cls, cwd=None, sudo=False, user=None, hostname=None, env=None, logging=True, **kwargs):
+    def load(cls, cwd=None, sudo=False, user=None, hostname=None, env=None, logging=True, port=None, **kwargs):
 
         context = {}
         context['cwd'] = cwd
         context['sudo'] = sudo
         context['hostname'] = hostname
+        context['port'] = port or '22'
         context['env'] = env or {}
         context['logging'] = logging
 
@@ -283,6 +284,7 @@ class Sultan(Base):
         # update with 'sudo' context
         sudo = context.get('sudo')
         user = context.get('user')
+        port = context.get('port')
         hostname = context.get('hostname')
         if sudo:
             if user != getpass.getuser():
@@ -294,9 +296,10 @@ class Sultan(Base):
             params = {
                 'user': user,
                 'hostname': hostname,
-                'command': output
+                'command': output, 
+                'port': port
             }
-            output = "ssh %(user)s@%(hostname)s '%(command)s'" % (params)
+            output = "ssh -p %(port)s %(user)s@%(hostname)s '%(command)s'" % (params)
 
         return output
 
