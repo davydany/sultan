@@ -87,7 +87,7 @@ class Sultan(Base):
         if user:
             context['user'] = user
         else:
-            context['user'] = 'root' if sudo else getpass.getuser()
+            context['user'] = getpass.getuser()
         context.update(kwargs)
 
         return cls(context=context)
@@ -285,7 +285,10 @@ class Sultan(Base):
         user = context.get('user')
         hostname = context.get('hostname')
         if sudo:
-            output = "sudo su - %s -c '%s'" % (user, output)
+            if user != getpass.getuser():
+                output = "sudo su - %s -c '%s'" % (user, output)
+            else:
+                output = "sudo %s" % (output)
 
         if hostname:
             params = {

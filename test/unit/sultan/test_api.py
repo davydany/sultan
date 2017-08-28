@@ -138,7 +138,7 @@ class SultanTestCase(unittest.TestCase):
         # sudo
         with Sultan.load(cwd='/tmp', sudo=True) as sultan:
             self.assertEqual(sultan.current_context, {
-                             'cwd': '/tmp', 'env': {}, 'sudo': True, 'logging': True, 'user': 'root', 'hostname': None})
+                             'cwd': '/tmp', 'env': {}, 'sudo': True, 'logging': True, 'user': getpass.getuser(), 'hostname': None})
 
         with Sultan.load(cwd='/tmp', sudo=False, user="hodor") as sultan:
             self.assertEqual(sultan.current_context, {
@@ -146,7 +146,7 @@ class SultanTestCase(unittest.TestCase):
 
         with Sultan.load(sudo=True) as sultan:
             self.assertEqual(sultan.current_context, {'cwd': None, 'env': {
-            }, 'sudo': True, 'logging': True, 'user': 'root', 'hostname': None})
+            }, 'sudo': True, 'logging': True, 'user': getpass.getuser(), 'hostname': None})
 
         # hostname
         with Sultan.load(hostname='localhost') as sultan:
@@ -169,15 +169,14 @@ class SultanTestCase(unittest.TestCase):
         with Sultan.load(sudo=False) as sultan:
             self.assertEqual(str(sultan.ls('-lah', '/root')), 'ls -lah /root;')
 
+        # sudo as current user
+        with Sultan.load(sudo=True) as sultan:
+            self.assertEqual(str(sultan.ls('-lah', '/root')), 'sudo ls -lah /root;')
+
         # sudo as another user
         with Sultan.load(sudo=True, user='hodor') as sultan:
             self.assertEqual(str(sultan.ls("/home/hodor")),
                              "sudo su - hodor -c 'ls /home/hodor;'")
-
-        # sudo as root
-        with Sultan.load(sudo=True) as sultan:
-            self.assertEqual(str(sultan.ls('-lah', '/root')),
-                             "sudo su - root -c 'ls -lah /root;'")
 
         # sudo as another user with cwd set
         with Sultan.load(sudo=True, user='hodor', cwd='/home/hodor') as sultan:
