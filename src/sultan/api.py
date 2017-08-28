@@ -154,6 +154,14 @@ class Sultan(Base):
         if name == "redirect":
             return Redirect(self, name)
         else:
+            # When calling Bash Commands from Python with Sultan, we encounter
+            # an issue where the Python doesn't allow special characters like 
+            # dashes (i.e.: apt-get). To get around this, we will use 2 
+            # underscores one after another to indicate that we want it to be a
+            # dash, and replace it accordingly before calling Command
+            name = name.replace('__', '-')
+
+            # call Command()
             return Command(self, name)
 
     def run(self, halt_on_nonzero=True, quiet=False, q=False):

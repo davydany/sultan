@@ -225,6 +225,10 @@ class SultanTestCase(unittest.TestCase):
         except:
             self.assertEqual(len(s.commands), 0)
 
+    def test_dashes(self):
+
+        with Sultan.load() as s:
+            self.assertEqual(str(s.apt__get('install', 'httpd')), 'apt-get install httpd;')
 
 class SultanCommandTestCase(unittest.TestCase):
 
