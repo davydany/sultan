@@ -135,7 +135,7 @@ class SultanTestCase(unittest.TestCase):
             'test_key': 'test_val',
             'user': getpass.getuser(),
             'hostname': None,
-            'port': '22'
+            'ssh_config': ''
         })
 
         # cwd
@@ -147,7 +147,7 @@ class SultanTestCase(unittest.TestCase):
                 'logging': True, 
                 'user': getpass.getuser(), 
                 'hostname': None,
-                'port': '22'
+                'ssh_config': ''
             })
 
         # sudo
@@ -159,7 +159,7 @@ class SultanTestCase(unittest.TestCase):
                 'logging': True, 
                 'user': getpass.getuser(), 
                 'hostname': None,
-                'port': '22'
+                'ssh_config': ''
             })
 
         with Sultan.load(cwd='/tmp', sudo=False, user="hodor") as sultan:
@@ -170,7 +170,7 @@ class SultanTestCase(unittest.TestCase):
                 'logging': True, 
                 'user': 'hodor', 
                 'hostname': None,
-                'port': '22'
+                'ssh_config': ''
             })
 
         with Sultan.load(sudo=True) as sultan:
@@ -182,7 +182,7 @@ class SultanTestCase(unittest.TestCase):
                 'logging': True, 
                 'user': getpass.getuser(), 
                 'hostname': None,
-                'port': '22'
+                'ssh_config': ''
             })
 
         # hostname
@@ -195,7 +195,7 @@ class SultanTestCase(unittest.TestCase):
                 'logging': True, 
                 'user': getpass.getuser(), 
                 'hostname': 'localhost',
-                'port': '22'
+                'ssh_config': ''
             })
 
         # set environment
@@ -207,11 +207,11 @@ class SultanTestCase(unittest.TestCase):
                 'logging': True, 
                 'user': getpass.getuser(), 
                 'hostname': None,
-                'port': '22'
+                'ssh_config': ''
             })
 
         # set port
-        with Sultan.load(port='2222') as sultan:
+        with Sultan.load(ssh_config={'port': '2222'}) as sultan:
             self.assertEqual(sultan.current_context, {
                 'cwd': None,
                 'env': {},
@@ -219,7 +219,7 @@ class SultanTestCase(unittest.TestCase):
                 'logging': True,
                 'user': getpass.getuser(),
                 'hostname': None,
-                'port': '2222'
+                'ssh_config': '-p 2222'
             })
 
     def test_context_for_pwd(self):
@@ -254,28 +254,28 @@ class SultanTestCase(unittest.TestCase):
         with Sultan.load(hostname='google.com') as sultan:
             user = getpass.getuser()
             self.assertEqual(str(sultan.ls("-lah", "/home")),
-                             "ssh -p 22 %s@google.com 'ls -lah /home;'" % user)
+                             "ssh %s@google.com 'ls -lah /home;'" % user)
 
         # local user
         with Sultan.load(hostname='google.com', user=getpass.getuser()) as sultan:
             user = getpass.getuser()
             self.assertEqual(str(sultan.ls("-lah", "/home")),
-                             "ssh -p 22 %s@google.com 'ls -lah /home;'" % user)
+                             "ssh %s@google.com 'ls -lah /home;'" % user)
 
         # different user
         with Sultan.load(hostname='google.com', user="obama") as sultan:
             user = "obama"
             self.assertEqual(str(sultan.ls("-lah", "/home")),
-                             "ssh -p 22 %s@google.com 'ls -lah /home;'" % user)
+                             "ssh %s@google.com 'ls -lah /home;'" % user)
 
         # different user as sudo
         with Sultan.load(hostname='google.com', user="obama", sudo=True) as sultan:
             user = "obama"
             self.assertEqual(str(sultan.ls("-lah", "/home")),
-                             "ssh -p 22 %s@google.com 'sudo su - obama -c \'ls -lah /home;\''" % user)
+                             "ssh %s@google.com 'sudo su - obama -c \'ls -lah /home;\''" % user)
 
         # different port and different user as sudo
-        with Sultan.load(hostname='google.com', user='obama', sudo=True, port=2345) as sultan:
+        with Sultan.load(hostname='google.com', user='obama', sudo=True, ssh_config={ 'port': 2345}) as sultan:
             user = 'obama'
             self.assertEqual(str(sultan.ls('-lah', '/home')),
                             "ssh -p 2345 %s@google.com 'sudo su - obama -c \'ls -lah /home;\''" % user)

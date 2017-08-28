@@ -74,13 +74,13 @@ class Sultan(Base):
     """
 
     @classmethod
-    def load(cls, cwd=None, sudo=False, user=None, hostname=None, env=None, logging=True, port=None, **kwargs):
+    def load(cls, cwd=None, sudo=False, user=None, hostname=None, env=None, logging=True, ssh_config=None, **kwargs):
 
         context = {}
         context['cwd'] = cwd
         context['sudo'] = sudo
         context['hostname'] = hostname
-        context['port'] = port or '22'
+        context['ssh_config'] = str(SSHConfig(ssh_config)) if ssh_config else ''
         context['env'] = env or {}
         context['logging'] = logging
 
@@ -284,7 +284,7 @@ class Sultan(Base):
         # update with 'sudo' context
         sudo = context.get('sudo')
         user = context.get('user')
-        port = context.get('port')
+        ssh_config = context.get('ssh_config')
         hostname = context.get('hostname')
         if sudo:
             if user != getpass.getuser():
@@ -297,9 +297,9 @@ class Sultan(Base):
                 'user': user,
                 'hostname': hostname,
                 'command': output, 
-                'port': port
+                'ssh_config': ' %s ' % ssh_config if ssh_config else ' '
             }
-            output = "ssh -p %(port)s %(user)s@%(hostname)s '%(command)s'" % (params)
+            output = "ssh%(ssh_config)s%(user)s@%(hostname)s '%(command)s'" % (params)
 
         return output
 
@@ -490,3 +490,56 @@ class Redirect(BaseCommand):
     def __str__(self):
 
         return self.command
+
+class Config(object):
+
+    params_map = {}
+
+    def __init__(self, config):
+
+        self.config = config or {}
+        self.validate_config()
+
+    def __str__(self):
+
+        output = []
+        print self.config
+        for key, value in self.config.iteritems():
+
+            shorthand = self.params_map[key]['shorthand']
+            output.append(shorthand)
+            output.append(str(value))
+            
+        return ' '.join(output)
+
+    def validate_config(self):
+        '''
+        Validates the provided config to make sure all the required fields are 
+        there.
+        '''
+        # first ensure that all the required fields are there
+        for key, key_config in self.params_map.iteritems():
+            if key_config['required']:
+                if key not in self.config:
+                    raise ValueError("Invalid Configuration! Required parameter '%s' was not provided to Sultan.")
+        
+        # second ensure that the fields that were pased were actually fields that
+        # can be used
+        for key in self.config.keys():
+            if key not in self.params_map:
+                raise ValueError("Invalid Configuration! The parameter '%s' provided is not used by Sultan!" % key)
+
+
+
+class SSHConfig(Config):
+
+    params_map = {
+        'identity_file': {
+            'shorthand': '-i',
+            'required': False
+        },
+        'port': {
+            'shorthand': '-p',
+            'required': False
+        }
+    }
