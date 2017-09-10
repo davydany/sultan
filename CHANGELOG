@@ -1,6 +1,10 @@
 # 0.6.0 (released September, 2017)
 - Argh, I need to update the damn changelog
-- Added 'SSHConfig' class for configuring SSH Sessions
+- FEATURE: Added support for dashes '-' in commands like 'apt-get'
+- BUG-FIXED: Fixed bug where we were calling 'sudo su - root' instead of just 'sudo'
+- FEATURE: Added 'SSHConfig' class for configuring SSH Sessions. Includes config for port and identity file.
+- DOCS: Added documentation for SSH commands.
+
 
 # 0.2.3 (released October 17, 2016)
 - Fixed issue where Sultan could not be installed. This is because VERSION file was

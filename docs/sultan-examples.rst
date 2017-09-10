@@ -37,8 +37,6 @@ the `tree` package. You'd do the following::
     with Sultan.load(sudo=True) as s:
         s.yum('install -y tree').run()
 
-
-
 **NOTE:** For the sake of brevity, this tutorial will now start to assume that
 `Sultan` has been imported from `sultan.api` and, the variable `s` has been 
 instantiated as an instance of `Sultan` (`s = Sultan()`). This will change in
@@ -151,3 +149,18 @@ Here is an example::
     with Sultan.load(logging=False) as sultan:
         sultan.ls('-lah', '/tmp').run()
 
+Example 10: Commands with Hyphones (i.e.: apt-get)
+--------------------------------------------------
+
+There are commands that are available in the shell that use hyphens which
+conflict with the function naming conventions of Python, for example 
+**apt-get**. To get around this, use double underscores (__).
+
+Here is an example::
+
+    with Sultan.load(sudo=True) as sultan:
+        sultan.apt__get('install', 'httpd').run()
+
+which runs::
+
+    sudo apt-get install httpd;
