@@ -1,3 +1,7 @@
+# 0.6.0 (released September, 2017)
+- Argh, I need to update the damn changelog
+- Added 'SSHConfig' class for configuring SSH Sessions
+
 # 0.2.3 (released October 17, 2016)
 - Fixed issue where Sultan could not be installed. This is because VERSION file was
 not included with the PyPi artifact. Fix was to add `MANIFEST.in` to resolve this.

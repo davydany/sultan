@@ -1,59 +1,87 @@
 
-===============
-Sultan Examples
-===============
+===================
+Sultan SSH Examples
+===================
 
 This tutorial will go through various examples to help in better understanding
-how to use Sultan. Each example will build on the lessons learned from the  
+how to use Sultan over SSH. Each example will build on the lessons learned from the  
 previous examples. 
 
-Example 1: Getting Started
---------------------------
+Example 1: SSH to Remote Host as the Current User
+-------------------------------------------------
 
-We typically use `yum` or `apt-get` to install a package on our system. 
-This example installs a package on our system using Sultan. Here is how
-to get started::
-
-    from sultan.api import Sultan
-
-    s = Sultan()
-    s.yum("install", "-y", "tree").run()
-
-Sultan allows multiple syntaxes depending on what your first command is.
-Suppose you want to not use separate tokens, and instead you want to use
-one string, you can write the above example as such::
-
+By default, you can simply specify the host to sultan, and calling the commands 
+like you normally do. This uses the username of the user who is executing the 
+script, and connects you to the remote host. 
 
     from sultan.api import Sultan
+    
+    with Sultan.load(hostname='aeroxis.com') as sultan:
+        s.yum('install', '-y', 'tree').run()
 
-    s = Sultan()
-    s.yum("install -y tree").run()
+Sultan will connect to the remote host, and run `yum install -y tree`. This is 
+what is passed to your shell to execute the command 
+(assuming your username is `davydany`):
 
-Suppose your user is not a root-user, and you want to call to sudo to install
-the `tree` package. You'd do the following::
+    ssh davydany@aeroxis.com 'yum install -y tree;'
 
-    from sultan.api import Sultan
+Example 2: SSH to Remote Host as a Different User
+-------------------------------------------------
 
-    with Sultan.load(sudo=True) as s:
-        s.yum('install -y tree').run()
+You can specify a different user to execute the remote commands by using the 
+`user` parameter, like this:
+
+    with Sultan.load(user='elon.musk', hostname='aeroxis.com') as s:
+        s.yum('install', '-y', 'tree').run()
+
+And this will execute:
+
+    ssh elon.musk@aeroxis.com 'yum install -y tree;'
+
+Example 3: Passing Additional Options (Port)
+--------------------------------------------
+
+**Added in v0.6**
+
+If you need to pass additional options for the port, use the `SSHConfig` class
+to configure the SSH Connection.
+    
+    from sultan.api import Sultan, SSHConfig
+    
+    port = 2222
+    config = SSHConfig(port=port)
+    with Sultan.load(user='elon.musk', 
+                     hostname='aeroxis.com', 
+                     ssh_config=config) as s:
+        s.yum('install', '-y', 'tree').run()
+    
+which will yield: 
+
+    ssh -p 2222 elon.musk@aeroxis.com 'yum install -y tree;'
 
 
+Example 4: Passing Additional Options (Identity File)
+-----------------------------------------------------
 
-**NOTE:** For the sake of brevity, this tutorial will now start to assume that
-`Sultan` has been imported from `sultan.api` and, the variable `s` has been 
-instantiated as an instance of `Sultan` (`s = Sultan()`). This will change in
-situations where the documentation requires a different usage.
+**Added in v0.6**
 
-Example 2: Sultan with Context Management
------------------------------------------
+If you need to pass additional options for the port, use the `SSHConfig` class
+to configure the SSH Connection.
 
-There are times when we want to manage the context of where Sultan executes 
-your code. To aid with this, we use Sultan in Context Management mode.
+    from sultan.api import Sultan, SSHConfig
 
-Suppose we want to cat out the contents of `/etc/hosts`, we'd do the following::
+    path_to_identity_file = '/home/elon.musk/keys/elon.musk.identity'
+    config = SSHConfig(identity_file=path_to_identity_file)
+    with Sultan.load(user='elon.musk', 
+                        hostname='aeroxis.com', 
+                        ssh_config=config) as s:
+        s.yum('install', '-y', 'tree').run()
+    
+which will yield: 
 
-    with Sultan.load(cwd="/etc") as s:
-        s.cat("hosts").run()
+    ssh -i /home/elon.musk/keys/elon.musk.identity elon.musk@aeroxis.com 'yum install -y tree;'
+
+
 
 Example 3: Compounding with And (&&) and Or (||)
 ------------------------------------------------

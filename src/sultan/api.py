@@ -74,13 +74,17 @@ class Sultan(Base):
     """
 
     @classmethod
-    def load(cls, cwd=None, sudo=False, user=None, hostname=None, env=None, logging=True, ssh_config=None, **kwargs):
+    def load(cls, 
+        cwd=None, sudo=False, user=None, 
+        hostname=None, env=None, logging=True, 
+        ssh_config=None, src=None, 
+        **kwargs):
 
         context = {}
         context['cwd'] = cwd
         context['sudo'] = sudo
         context['hostname'] = hostname
-        context['ssh_config'] = str(SSHConfig(ssh_config)) if ssh_config else ''
+        context['ssh_config'] = str(ssh_config) if ssh_config else ''
         context['env'] = env or {}
         context['logging'] = logging
 
@@ -495,7 +499,7 @@ class Config(object):
 
     params_map = {}
 
-    def __init__(self, config):
+    def __init__(self, **config):
 
         self.config = config or {}
         self.validate_config()
@@ -503,7 +507,6 @@ class Config(object):
     def __str__(self):
 
         output = []
-        print self.config
         for key, value in self.config.iteritems():
 
             shorthand = self.params_map[key]['shorthand']
@@ -541,5 +544,5 @@ class SSHConfig(Config):
         'port': {
             'shorthand': '-p',
             'required': False
-        }
+        },
     }

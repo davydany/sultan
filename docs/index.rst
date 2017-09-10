@@ -21,6 +21,7 @@ Sultan
     install-sultan
     faq
     sultan-examples
+    sultan-ssh-examples
 
 -------------------------------
 
