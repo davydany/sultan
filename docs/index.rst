@@ -21,6 +21,7 @@ Sultan
     install-sultan
     faq
     sultan-examples
+    sultan-ssh-examples
 
 -------------------------------
 
@@ -107,3 +108,18 @@ Want to get started? Simply install Sultan, and start writing your clean code::
 
 If you have more questions, check the rest of the docs, or reach out at 
 Github: https://github.com/aeroxis/sultan
+
+
+WARNING * WARNING * WARNING
+---------------------------
+
+When you're using Sultan, you are running commands directly on your local shell,
+so please, do not run untested and untrusted code. You are taking the risk if
+you are running untrusted code. 
+
+Sultan runs *POpen* with *shell=True*, and according to Python documentation,
+this can be a security hazard if combined with untrusted input. More information
+can be found here: 
+
+* Python 2: https://docs.python.org/2/library/subprocess.html#frequently-used-arguments
+* Python 3: https://docs.python.org/3/library/subprocess.html#frequently-used-arguments

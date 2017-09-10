@@ -59,8 +59,9 @@ import sys
 
 from .core import Base
 from .config import Settings
-from .exceptions import InvalidContextError
 from .echo import Echo
+from .exceptions import InvalidContextError
+from .result import Result
 
 __all__ = ['Sultan']
 
@@ -74,20 +75,35 @@ class Sultan(Base):
     """
 
     @classmethod
-    def load(cls, cwd=None, sudo=False, user=None, hostname=None, env=None, logging=True, **kwargs):
+    def load(cls, 
+        cwd=None, sudo=False, user=None, 
+        hostname=None, env=None, logging=True, 
+        ssh_config=None, src=None, 
+        **kwargs):
+
+        # initial checks
+        if ssh_config and not isinstance(ssh_config, SSHConfig):
+            msg = "The config passed (%s) must be an instance of SSHConfig." % \
+                ssh_config
+            raise ValueError(msg)
+
+        if src and not os.path.exists(src):
+            raise IOError("The Source File provided (%s) does not exist" % src)
 
         context = {}
         context['cwd'] = cwd
         context['sudo'] = sudo
         context['hostname'] = hostname
+        context['ssh_config'] = str(ssh_config) if ssh_config else ''
         context['env'] = env or {}
         context['logging'] = logging
+        context['src'] = src
 
         # determine user
         if user:
             context['user'] = user
         else:
-            context['user'] = 'root' if sudo else getpass.getuser()
+            context['user'] = getpass.getuser()
         context.update(kwargs)
 
         return cls(context=context)
@@ -154,18 +170,20 @@ class Sultan(Base):
         if name == "redirect":
             return Redirect(self, name)
         else:
+            # When calling Bash Commands from Python with Sultan, we encounter
+            # an issue where the Python doesn't allow special characters like 
+            # dashes (i.e.: apt-get). To get around this, we will use 2 
+            # underscores one after another to indicate that we want it to be a
+            # dash, and replace it accordingly before calling Command
+            name = name.replace('__', '-')
+
+            # call Command()
             return Command(self, name)
 
     def run(self, halt_on_nonzero=True, quiet=False, q=False):
         """
         After building your commands, call `run()` to have your code executed.
         """
-        def format_lines(lines):
-            for line in lines:
-                self._echo.error(format_line(line))
-
-        def format_line(msg):
-            return "| %s" % msg
 
         commands = str(self)
         if not (quiet or q):
@@ -182,39 +200,34 @@ class Sultan(Base):
                                               stdout=subprocess.PIPE,
                                               stderr=subprocess.PIPE,
                                               universal_newlines=True).communicate()
+            result = Result(stdout, stderr)
 
-            if stdout:
-                return stdout.strip().splitlines()
+            if result.stdout:
+                return result 
 
-            if stderr:
-                self._echo.critical("--{ STDERR }---" + "-" * 100)
-                format_lines(stderr.strip().split('\n'))
-                self._echo.critical("---------------" + "-" * 100)
-
+            if result.stderr:
+                result.print_stderr()
+                
             return stdout
 
         except Exception:
             tb = traceback.format_exc().split("\n")
 
             self._echo.critical("Unable to run '%s'" % commands)
+            result = Result(stdout, stderr, traceback=tb)
 
             #  traceback
-            self._echo.critical("--{ TRACEBACK }" + "-" * 100)
-            format_lines(tb)
-            self._echo.critical("---------------" + "-" * 100)
+            result.print_traceback()
 
             # standard out
-            if stdout:
-                self._echo.critical("--{ STDOUT }---" + "-" * 100)
-                format_lines(stdout)
-                self._echo.critical("---------------" + "-" * 100)
+            if result.stdout:
+                result.print_stdout()
 
             # standard error
-            if stderr:
-                self._echo.critical("--{ STDERR }---" + "-" * 100)
-                format_lines(stderr)
-                self._echo.critical("---------------" + "-" * 100)
+            if result.stderr:
+                result.print_stderr()
 
+            # halt on error if it is requested
             if self.settings.HALT_ON_ERROR:
                 if halt_on_nonzero:
                     raise
@@ -272,20 +285,31 @@ class Sultan(Base):
             prepend = "cd %s && " % (cwd)
             output = prepend + output
 
+        # update with 'src' context
+        src = context.get('src')
+        if src:
+            prepend = "source %s && " % (src)
+            output = prepend + output
+
         # update with 'sudo' context
         sudo = context.get('sudo')
         user = context.get('user')
+        ssh_config = context.get('ssh_config')
         hostname = context.get('hostname')
         if sudo:
-            output = "sudo su - %s -c '%s'" % (user, output)
+            if user != getpass.getuser():
+                output = "sudo su - %s -c '%s'" % (user, output)
+            else:
+                output = "sudo %s" % (output)
 
         if hostname:
             params = {
                 'user': user,
                 'hostname': hostname,
-                'command': output
+                'command': output, 
+                'ssh_config': ' %s ' % ssh_config if ssh_config else ' '
             }
-            output = "ssh %(user)s@%(hostname)s '%(command)s'" % (params)
+            output = "ssh%(ssh_config)s%(user)s@%(hostname)s '%(command)s'" % (params)
 
         return output
 
@@ -337,7 +361,6 @@ class Sultan(Base):
     def stdin(self, message):
 
         return input(message)
-
 
 class BaseCommand(Base):
     """
@@ -476,3 +499,55 @@ class Redirect(BaseCommand):
     def __str__(self):
 
         return self.command
+
+class Config(object):
+
+    params_map = {}
+
+    def __init__(self, **config):
+
+        self.config = config or {}
+        self.validate_config()
+
+    def __str__(self):
+
+        output = []
+        for key, value in self.config.items():
+
+            shorthand = self.params_map[key]['shorthand']
+            output.append(shorthand)
+            output.append(str(value))
+            
+        return ' '.join(output)
+
+    def validate_config(self):
+        '''
+        Validates the provided config to make sure all the required fields are 
+        there.
+        '''
+        # first ensure that all the required fields are there
+        for key, key_config in self.params_map.items():
+            if key_config['required']:
+                if key not in self.config:
+                    raise ValueError("Invalid Configuration! Required parameter '%s' was not provided to Sultan.")
+        
+        # second ensure that the fields that were pased were actually fields that
+        # can be used
+        for key in self.config.keys():
+            if key not in self.params_map:
+                raise ValueError("Invalid Configuration! The parameter '%s' provided is not used by Sultan!" % key)
+
+
+
+class SSHConfig(Config):
+
+    params_map = {
+        'identity_file': {
+            'shorthand': '-i',
+            'required': False
+        },
+        'port': {
+            'shorthand': '-p',
+            'required': False
+        },
+    }

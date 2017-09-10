@@ -1,3 +1,14 @@
+# 0.6.0 (released September, 2017)
+- Argh, I need to update the damn changelog
+- FEATURE: Added support for dashes '-' in commands like 'apt-get'
+- FEATURE: Added a Result object that contains STDOUT, STDERR and TRACEBACK.
+- FEATURE: Added 'SSHConfig' class for configuring SSH Sessions. Includes config for port and identity file.
+- BUG-FIXED: Fixed bug where we were calling 'sudo su - root' instead of just 'sudo'
+- DOCS: Added documentation for SSH commands.
+- DOCS: Added documentation for getting STDOUT, STDERR and TRACEBACK from a command.
+
+
+
 # 0.2.3 (released October 17, 2016)
 - Fixed issue where Sultan could not be installed. This is because VERSION file was
 not included with the PyPi artifact. Fix was to add `MANIFEST.in` to resolve this.

@@ -1,11 +1,26 @@
 
-========
-Examples
-========
+===============
+Sultan Examples
+===============
 
 This tutorial will go through various examples to help in better understanding
 how to use Sultan. Each example will build on the lessons learned from the  
-previous examples. 
+previous examples.
+
+WARNING * WARNING * WARNING
+---------------------------
+
+When you're using Sultan, you are running commands directly on your local shell,
+so please, do not run untested and untrusted code. You are taking the risk if
+you are running untrusted code. 
+
+Sultan runs *POpen* with *shell=True*, and according to Python documentation,
+this can be a security hazard if combined with untrusted input. More information
+can be found here: 
+
+* Python 2: https://docs.python.org/2/library/subprocess.html#frequently-used-arguments
+* Python 3: https://docs.python.org/3/library/subprocess.html#frequently-used-arguments
+
 
 Example 1: Getting Started
 --------------------------
@@ -36,8 +51,6 @@ the `tree` package. You'd do the following::
 
     with Sultan.load(sudo=True) as s:
         s.yum('install -y tree').run()
-
-
 
 **NOTE:** For the sake of brevity, this tutorial will now start to assume that
 `Sultan` has been imported from `sultan.api` and, the variable `s` has been 
@@ -150,3 +163,60 @@ Here is an example::
     # runs without logging
     with Sultan.load(logging=False) as sultan:
         sultan.ls('-lah', '/tmp').run()
+
+Example 10: Commands with Hyphones (i.e.: apt-get)
+--------------------------------------------------
+
+There are commands that are available in the shell that use hyphens which
+conflict with the function naming conventions of Python, for example 
+**apt-get**. To get around this, use double underscores (__).
+
+Here is an example::
+
+    with Sultan.load(sudo=True) as sultan:
+        sultan.apt__get('install', 'httpd').run()
+
+which runs::
+
+    sudo apt-get install httpd;
+
+Example 11: Sourcing a File before Running a Command
+----------------------------------------------------
+
+This is rare, but there are times that we would like to source a file before
+running a command. We can manually do this with the Bash And Operator (&&) but
+Sultan has the ability to do this automatically for you.
+
+Here is an example::
+
+    with Sultan.load(
+            cwd='/home/davydany/projects/sultan',
+            src='/home/davydany/.virtualenv/sultan/bin/activate') as s:
+        s.pip('install', '-r', 'requirements.txt').run()
+
+which runs::
+
+    source /home/davydany/.virtualenv/sultan/bin/activate && cd /home/davydany/projects/sultan && pip install -r requirements.txt;
+
+Example 12: Results from a Command
+----------------------------------
+
+When you run a command, your shell gives back results in stdout and stderr.
+Sultan returns a Result object which has **stdout**, **stderr** and 
+**traceback** object. 
+
+Here is an example that shows how to get the results of a command::
+
+with Sultan.load() as s:
+
+    result = s.yum('install', '-y', 'postgresql')
+    result.stdout # the stdout
+    result.stderr # the stderr
+    result.traceback # the traceback
+
+**stdout** and **stderr** returns a list, where each element is a line from 
+**stdout** and **stderr**.
+
+Most times, you don't need to access the results of a command, but there are 
+times that you need to do so. For that, the **Result** object will be how you
+access it.

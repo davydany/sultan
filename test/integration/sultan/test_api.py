@@ -37,7 +37,7 @@ class SultanEnvironment(unittest.TestCase):
         with Sultan.load(env={ 'FOOBAR': '/tmp' }) as s:
 
             response = s.env().run()
-            self.assertIn('FOOBAR=/tmp', response)
+            self.assertIn('FOOBAR=/tmp', response.stdout)
 
 class SultanRunCustomScripts(unittest.TestCase):
     """
@@ -76,6 +76,6 @@ echo 'Donec sapien turpis, mattis vel urna sed, iaculis aliquam purus.\n' > $OUT
             self.assertEqual(len(response), 0)
 
             response = s.cat(self.output_filepath).run()
-            self.assertEqual(response, ['Donec sapien turpis, mattis vel urna sed, iaculis aliquam purus.'])
+            self.assertEqual(response.stdout, ['Donec sapien turpis, mattis vel urna sed, iaculis aliquam purus.'])
         finally:
             shutil.rmtree(self.dir_path)
