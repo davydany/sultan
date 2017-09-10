@@ -1,22 +1,22 @@
 language: python
 python:
-  - "2.7"
-  - "3.3"
-  - "3.4"
-  - "3.5"
-  - "3.6"
+- '2.7'
+- '3.3'
+- '3.4'
+- '3.5'
+- '3.6'
 install:
 - pip install -r requirements/test.txt
 - pip install -r docs/requirements.txt
-script: 
-  - make tests
-  - cd docs && make html
+script:
+- make tests
+- cd docs && make html
 deploy:
   provider: pypi
   distributions: bdist_wheel
   user: davydany
   password:
-    secure: qmq/l+jWE1bcVLsSE52O1fgINLa3nknYkrnLTTNzYfZ/HMq448qBC4heDlSaWcEpbDUhMKg4DNf1CJ+3F1t4xKIuVGE3nyKTYLdrcc9uCeFtoznjK7ajPG5S1/uPKhQW9p9GzoxAcInj8mDjyT+zB3y69Re2mgcLBHxO5/VBZs9mfoKmZCWgt0DV0pxgjg8yzTZmGIjVVJhmw4rrliX2Vzg0bj074Vgv99ZJqHhPWhdozsl8J4ufxfP4XSC7Sc6E6tuYlHKbqXQWk6R1UYAtRToNO5KRs+UjUSpCvICF5xtntl4oraYEPmGp1sCsAKt3liZZ5zZFgHvvkNMC4zjSMKg8q0zS6i2zpYJhtXly5PdEbCbcabOLVgX6bZGGDck5YGUmFZp3UcQs6H0wSInexsznIInxtmi6xWeSEg4eIl6rL3nsmyURg6IafLBr46vLxQXP5Hfn58XATPQedVQBr8iP9rY1ZkutYJaPu1PWrLa1UO+S9vpGp/BFiUH/pnVSQSXx8g2Gk2/20Ijlzo0IJtbiLOWdYJ8dBUxy+8lJv5MpenU+OkvPIFZlNMraAhXche7ZRjA6jt75fqYrHsnmbLP8RK/9MyrnX8NXKVUEeyYwwI5jZRHMm1MXTExDOVybyx0VBhB0HojUj0sdmacVV4biUlz+EJCt0u/xbtr+syE=
+    secure: nhaBAgq1o53xSMM/PEUa2j2LDxBI67kCTcSLYgIE5wVUe7EU8Sc48Id9Yj+i0fzxWcFgxPCZChfuH0OQo+4y9or5oiEJF0jeOYg2UeipQo2AGIpvV1mk5jAn5/uknczAap0ugpuUyIGmkYJJb5GhrEa12+goucxVPJ7kajGAEe1RL1gE3HAR/YkEu9H+LWix5YbA0lE7B1a/lm9+T4MkvheQeuYPGTRFqioiV5SA1iiGrgvLDuiAt0ZUzoNTWA/jTpiFTXOUAXGbVEGyrscOit2mknXPqs2JFAHl5GJhKDjsDOhgNB5s+M1ChlQCSrSvED3PIsQ4brRBYPTV/TOGziDrDJA5nOAHhTgTv+s/PBQ2Y62vEZfxZrks/IWlQvuZnyqB77tXSKLY87z/ID8KCajzsIoLpzv1E9p4IoZ1RZOkSYMyps7cFJtUMWqfIsyxfDZ4ZaNNdq7gbAkcJsHlP5C5QWRl/zo0X6txfdNvkTcpM365/P9fo5NtkUdsxcYRGlkK0guJpjSzGpwm+yrgtV+4OCEms11lVq1P9I81zFoAYSyF8bzA4Y7CliBkVi2GDRHI1n2tOdEIHxV9ROGyJFW+LgSshbwLarvFNbTEOukEjIrE/FDrfwhxBahhwWXlt/6Q1a3+34qz0DEIIDPui4a9OkYuLTaAiBmgQAqI0IM=
   on:
     repo: aeroxis/sultan
     branch: master
