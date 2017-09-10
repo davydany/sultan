@@ -11,6 +11,7 @@ install:
 script:
 - make tests
 - cd docs && make html
+- cd ..
 deploy:
   provider: pypi
   distributions: bdist_wheel
