@@ -80,6 +80,12 @@ class Sultan(Base):
         ssh_config=None, src=None, 
         **kwargs):
 
+        # initial checks
+        if ssh_config and not isinstance(ssh_config, SSHConfig):
+            msg = "The config passed (%s) must be an instance of SSHConfig." % \
+                ssh_config
+            raise ValueError(msg)
+
         context = {}
         context['cwd'] = cwd
         context['sudo'] = sudo
