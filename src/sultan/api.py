@@ -512,7 +512,7 @@ class Config(object):
     def __str__(self):
 
         output = []
-        for key, value in self.config.iteritems():
+        for key, value in self.config.items():
 
             shorthand = self.params_map[key]['shorthand']
             output.append(shorthand)
@@ -526,7 +526,7 @@ class Config(object):
         there.
         '''
         # first ensure that all the required fields are there
-        for key, key_config in self.params_map.iteritems():
+        for key, key_config in self.params_map.items():
             if key_config['required']:
                 if key not in self.config:
                     raise ValueError("Invalid Configuration! Required parameter '%s' was not provided to Sultan.")
