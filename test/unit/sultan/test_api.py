@@ -3,6 +3,7 @@ import mock
 import os
 import shutil
 import subprocess
+import tempfile
 import unittest
 import getpass
 
@@ -33,7 +34,7 @@ class SultanTestCase(unittest.TestCase):
         sultan = Sultan()
         response = sultan.ls("-lah /tmp").run()
         self.assertTrue(m_subprocess.Popen().communicate.called)
-        self.assertEqual(response, ["sample_response"])
+        self.assertEqual(response.stdout, ["sample_response"])
 
     def test_run_advanced(self):
 
@@ -46,7 +47,7 @@ class SultanTestCase(unittest.TestCase):
                 .run()
 
             response = sultan.ls("-1 /tmp/mytestdir/").run()
-            self.assertEqual(response, ['a', 'b', 'foobar'])
+            self.assertEqual(response.stdout, ['a', 'b', 'foobar'])
         finally:
             if os.path.exists('/tmp/mytestdir'):
                 shutil.rmtree('/tmp/mytestdir')
@@ -103,7 +104,7 @@ class SultanTestCase(unittest.TestCase):
         sultan = Sultan()
         sultan.touch("/tmp/foo").run()
         response = sultan.ls("-1 /tmp/foo").run()
-        self.assertEqual(response, ["/tmp/foo"])
+        self.assertEqual(response.stdout, ["/tmp/foo"])
 
     def test_and(self):
 
@@ -135,7 +136,8 @@ class SultanTestCase(unittest.TestCase):
             'test_key': 'test_val',
             'user': getpass.getuser(),
             'hostname': None,
-            'ssh_config': ''
+            'ssh_config': '',
+            'src': None
         })
 
         # cwd
@@ -147,7 +149,8 @@ class SultanTestCase(unittest.TestCase):
                 'logging': True, 
                 'user': getpass.getuser(), 
                 'hostname': None,
-                'ssh_config': ''
+                'ssh_config': '',
+                'src': None
             })
 
         # sudo
@@ -159,7 +162,8 @@ class SultanTestCase(unittest.TestCase):
                 'logging': True, 
                 'user': getpass.getuser(), 
                 'hostname': None,
-                'ssh_config': ''
+                'ssh_config': '',
+                'src': None
             })
 
         with Sultan.load(cwd='/tmp', sudo=False, user="hodor") as sultan:
@@ -170,7 +174,8 @@ class SultanTestCase(unittest.TestCase):
                 'logging': True, 
                 'user': 'hodor', 
                 'hostname': None,
-                'ssh_config': ''
+                'ssh_config': '',
+                'src': None
             })
 
         with Sultan.load(sudo=True) as sultan:
@@ -182,7 +187,8 @@ class SultanTestCase(unittest.TestCase):
                 'logging': True, 
                 'user': getpass.getuser(), 
                 'hostname': None,
-                'ssh_config': ''
+                'ssh_config': '',
+                'src': None
             })
 
         # hostname
@@ -195,7 +201,8 @@ class SultanTestCase(unittest.TestCase):
                 'logging': True, 
                 'user': getpass.getuser(), 
                 'hostname': 'localhost',
-                'ssh_config': ''
+                'ssh_config': '',
+                'src': None
             })
 
         # set environment
@@ -207,7 +214,8 @@ class SultanTestCase(unittest.TestCase):
                 'logging': True, 
                 'user': getpass.getuser(), 
                 'hostname': None,
-                'ssh_config': ''
+                'ssh_config': '',
+                'src': None
             })
 
         # set port
@@ -220,8 +228,28 @@ class SultanTestCase(unittest.TestCase):
                 'logging': True,
                 'user': getpass.getuser(),
                 'hostname': None,
-                'ssh_config': '-p 2222'
+                'ssh_config': '-p 2222',
+                'src': None
             })
+
+        # set src
+        filehandle, filepath = tempfile.mkstemp()
+        try:
+            with Sultan.load(src=filepath) as s:
+                self.assertEqual(s.current_context, {
+                    'cwd': None,
+                    'env': {},
+                    'sudo': False,
+                    'logging': True,
+                    'user': getpass.getuser(),
+                    'hostname': None,
+                    'ssh_config': '',
+                    'src': filepath
+                })
+        finally:
+            if os.path.exists(filepath):
+                os.unlink(filepath)
+
 
     def test_context_for_pwd(self):
 
@@ -302,6 +330,32 @@ class SultanTestCase(unittest.TestCase):
         with Sultan.load() as s:
             self.assertEqual(str(s.apt__get('install', 'httpd')),
                              'apt-get install httpd;')
+
+    def test_src(self):
+
+        handle, filepath = tempfile.mkstemp()
+        try:
+
+            with Sultan.load(src=filepath) as s:
+                self.assertEqual(
+                    str(s.yum('install', 'apache')), 
+                    'source %s && yum install apache;' % filepath)
+        finally:
+            if os.path.exists(filepath):
+                os.unlink(filepath)
+    
+    def test_src_with_compound(self):
+
+        handle, filepath = tempfile.mkstemp()
+        try:
+
+            with Sultan.load(cwd='/tmp', src=filepath) as s:
+                self.assertEqual(
+                    str(s.yum('install', 'apache')), 
+                    'source %s && cd /tmp && yum install apache;' % filepath)
+        finally:
+            if os.path.exists(filepath):
+                os.unlink(filepath)
 
 
 class SultanCommandTestCase(unittest.TestCase):

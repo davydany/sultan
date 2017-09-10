@@ -198,3 +198,25 @@ which runs::
 
     source /home/davydany/.virtualenv/sultan/bin/activate && cd /home/davydany/projects/sultan && pip install -r requirements.txt;
 
+Example 12: Results from a Command
+----------------------------------
+
+When you run a command, your shell gives back results in stdout and stderr.
+Sultan returns a Result object which has **stdout**, **stderr** and 
+**traceback** object. 
+
+Here is an example that shows how to get the results of a command::
+
+with Sultan.load() as s:
+
+    result = s.yum('install', '-y', 'postgresql')
+    result.stdout # the stdout
+    result.stderr # the stderr
+    result.traceback # the traceback
+
+**stdout** and **stderr** returns a list, where each element is a line from 
+**stdout** and **stderr**.
+
+Most times, you don't need to access the results of a command, but there are 
+times that you need to do so. For that, the **Result** object will be how you
+access it.

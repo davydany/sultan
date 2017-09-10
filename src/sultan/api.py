@@ -59,8 +59,9 @@ import sys
 
 from .core import Base
 from .config import Settings
-from .exceptions import InvalidContextError
 from .echo import Echo
+from .exceptions import InvalidContextError
+from .result import Result
 
 __all__ = ['Sultan']
 
@@ -86,6 +87,9 @@ class Sultan(Base):
                 ssh_config
             raise ValueError(msg)
 
+        if src and not os.path.exists(src):
+            raise IOError("The Source File provided (%s) does not exist" % src)
+
         context = {}
         context['cwd'] = cwd
         context['sudo'] = sudo
@@ -93,6 +97,7 @@ class Sultan(Base):
         context['ssh_config'] = str(ssh_config) if ssh_config else ''
         context['env'] = env or {}
         context['logging'] = logging
+        context['src'] = src
 
         # determine user
         if user:
@@ -179,12 +184,6 @@ class Sultan(Base):
         """
         After building your commands, call `run()` to have your code executed.
         """
-        def format_lines(lines):
-            for line in lines:
-                self._echo.error(format_line(line))
-
-        def format_line(msg):
-            return "| %s" % msg
 
         commands = str(self)
         if not (quiet or q):
@@ -201,39 +200,34 @@ class Sultan(Base):
                                               stdout=subprocess.PIPE,
                                               stderr=subprocess.PIPE,
                                               universal_newlines=True).communicate()
+            result = Result(stdout, stderr)
 
-            if stdout:
-                return stdout.strip().splitlines()
+            if result.stdout:
+                return result 
 
-            if stderr:
-                self._echo.critical("--{ STDERR }---" + "-" * 100)
-                format_lines(stderr.strip().split('\n'))
-                self._echo.critical("---------------" + "-" * 100)
-
+            if result.stderr:
+                result.print_stderr()
+                
             return stdout
 
         except Exception:
             tb = traceback.format_exc().split("\n")
 
             self._echo.critical("Unable to run '%s'" % commands)
+            result = Result(stdout, stderr, traceback=tb)
 
             #  traceback
-            self._echo.critical("--{ TRACEBACK }" + "-" * 100)
-            format_lines(tb)
-            self._echo.critical("---------------" + "-" * 100)
+            result.print_traceback()
 
             # standard out
-            if stdout:
-                self._echo.critical("--{ STDOUT }---" + "-" * 100)
-                format_lines(stdout)
-                self._echo.critical("---------------" + "-" * 100)
+            if result.stdout:
+                result.print_stdout()
 
             # standard error
-            if stderr:
-                self._echo.critical("--{ STDERR }---" + "-" * 100)
-                format_lines(stderr)
-                self._echo.critical("---------------" + "-" * 100)
+            if result.stderr:
+                result.print_stderr()
 
+            # halt on error if it is requested
             if self.settings.HALT_ON_ERROR:
                 if halt_on_nonzero:
                     raise
@@ -289,6 +283,12 @@ class Sultan(Base):
         cwd = context.get('cwd')
         if cwd:
             prepend = "cd %s && " % (cwd)
+            output = prepend + output
+
+        # update with 'src' context
+        src = context.get('src')
+        if src:
+            prepend = "source %s && " % (src)
             output = prepend + output
 
         # update with 'sudo' context
@@ -361,7 +361,6 @@ class Sultan(Base):
     def stdin(self, message):
 
         return input(message)
-
 
 class BaseCommand(Base):
     """
