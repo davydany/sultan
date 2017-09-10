@@ -6,7 +6,7 @@ import subprocess
 import unittest
 import getpass
 
-from sultan.api import And, Or, Command, Pipe, Redirect, Sultan
+from sultan.api import And, Or, Command, Pipe, Redirect, Sultan, SSHConfig
 from sultan.config import Settings
 from sultan.exceptions import InvalidContextError
 
@@ -211,7 +211,8 @@ class SultanTestCase(unittest.TestCase):
             })
 
         # set port
-        with Sultan.load(ssh_config={'port': '2222'}) as sultan:
+        config = SSHConfig(port=2222)
+        with Sultan.load(ssh_config=config) as sultan:
             self.assertEqual(sultan.current_context, {
                 'cwd': None,
                 'env': {},
@@ -275,7 +276,8 @@ class SultanTestCase(unittest.TestCase):
                              "ssh %s@google.com 'sudo su - obama -c \'ls -lah /home;\''" % user)
 
         # different port and different user as sudo
-        with Sultan.load(hostname='google.com', user='obama', sudo=True, ssh_config={ 'port': 2345}) as sultan:
+        config = SSHConfig(port=2345)
+        with Sultan.load(hostname='google.com', user='obama', sudo=True, ssh_config=config) as sultan:
             user = 'obama'
             self.assertEqual(str(sultan.ls('-lah', '/home')),
                             "ssh -p 2345 %s@google.com 'sudo su - obama -c \'ls -lah /home;\''" % user)
