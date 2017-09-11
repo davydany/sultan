@@ -72,8 +72,7 @@ echo 'Donec sapien turpis, mattis vel urna sed, iaculis aliquam purus.\n' > $OUT
         try:
             s = Sultan()
             response = s.myscript(where=self.dir_path).run()
-            print("response: %s" % str(response))
-            self.assertEqual(len(response), 0)
+            self.assertEqual(len(response.stdout), 0)
 
             response = s.cat(self.output_filepath).run()
             self.assertEqual(response.stdout, ['Donec sapien turpis, mattis vel urna sed, iaculis aliquam purus.'])
