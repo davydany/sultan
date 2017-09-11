@@ -296,14 +296,17 @@ class Sultan(Base):
         # update with 'sudo' context
         sudo = context.get('sudo')
         user = context.get('user')
-        ssh_config = context.get('ssh_config')
-        hostname = context.get('hostname')
         if sudo:
             if user != getpass.getuser():
                 output = "sudo su - %s -c '%s'" % (user, output)
+            elif getpass.getuser() == 'root':
+                output = "su - %s -c '%s'" % (user, output)
             else:
                 output = "sudo %s" % (output)
 
+        # if we have to ssh, prepare for the SSH command
+        ssh_config = context.get('ssh_config')
+        hostname = context.get('hostname')
         if hostname:
             params = {
                 'user': user,
