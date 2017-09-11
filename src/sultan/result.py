@@ -14,10 +14,6 @@ class Result(Base):
         self.__traceback = traceback
         self.__echo = Echo()
 
-    def __repr__(self):
-
-        return self.__stdout.strip().splitlines()
-
     def __str__(self):
 
         return '\n'.join(self.__stdout)

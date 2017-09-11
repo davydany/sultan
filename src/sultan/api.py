@@ -208,7 +208,7 @@ class Sultan(Base):
             if result.stderr:
                 result.print_stderr()
                 
-            return stdout
+            return result
 
         except Exception:
             tb = traceback.format_exc().split("\n")
@@ -234,6 +234,8 @@ class Sultan(Base):
 
             if halt_on_nonzero:
                 raise
+
+            return result
 
         finally:
 
