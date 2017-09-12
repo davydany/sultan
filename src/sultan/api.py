@@ -95,7 +95,7 @@ class Sultan(Base):
         context['sudo'] = sudo
         context['hostname'] = hostname
         context['ssh_config'] = str(ssh_config) if ssh_config else ''
-        context['env'] = env or {}
+        context['env'] = env or None # must be None, for Python to get the current process's env.
         context['logging'] = logging
         context['src'] = src
 
