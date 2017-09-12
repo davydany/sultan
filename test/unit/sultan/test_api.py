@@ -130,7 +130,7 @@ class SultanTestCase(unittest.TestCase):
         sultan = Sultan.load(cwd='/tmp', test_key='test_val')
         self.assertEqual(sultan.current_context, {
             'cwd': '/tmp',
-            'env': {},
+            'env': None,
             'sudo': False,
             'logging': True,
             'test_key': 'test_val',
@@ -144,7 +144,7 @@ class SultanTestCase(unittest.TestCase):
         with Sultan.load(cwd='/tmp') as sultan:
             self.assertEqual(sultan.current_context, {
                 'cwd': '/tmp', 
-                'env': {}, 
+                'env': None, 
                 'sudo': False, 
                 'logging': True, 
                 'user': getpass.getuser(), 
@@ -157,7 +157,7 @@ class SultanTestCase(unittest.TestCase):
         with Sultan.load(cwd='/tmp', sudo=True) as sultan:
             self.assertEqual(sultan.current_context, {
                 'cwd': '/tmp', 
-                'env': {}, 
+                'env': None, 
                 'sudo': True, 
                 'logging': True, 
                 'user': getpass.getuser(), 
@@ -169,7 +169,7 @@ class SultanTestCase(unittest.TestCase):
         with Sultan.load(cwd='/tmp', sudo=False, user="hodor") as sultan:
             self.assertEqual(sultan.current_context, {
                 'cwd': '/tmp', 
-                'env': {}, 
+                'env': None, 
                 'sudo': False, 
                 'logging': True, 
                 'user': 'hodor', 
@@ -181,8 +181,8 @@ class SultanTestCase(unittest.TestCase):
         with Sultan.load(sudo=True) as sultan:
             
             self.assertEqual(sultan.current_context, {
-                'cwd': None, 
-                'env': {}, 
+                'cwd': None,
+                'env': None,
                 'sudo': True, 
                 'logging': True, 
                 'user': getpass.getuser(), 
@@ -196,7 +196,7 @@ class SultanTestCase(unittest.TestCase):
             
             self.assertEqual(sultan.current_context, {
                 'cwd': None, 
-                'env': {}, 
+                'env': None, 
                 'sudo': False, 
                 'logging': True, 
                 'user': getpass.getuser(), 
@@ -223,7 +223,7 @@ class SultanTestCase(unittest.TestCase):
         with Sultan.load(ssh_config=config) as sultan:
             self.assertEqual(sultan.current_context, {
                 'cwd': None,
-                'env': {},
+                'env': None,
                 'sudo': False,
                 'logging': True,
                 'user': getpass.getuser(),
@@ -238,7 +238,7 @@ class SultanTestCase(unittest.TestCase):
             with Sultan.load(src=filepath) as s:
                 self.assertEqual(s.current_context, {
                     'cwd': None,
-                    'env': {},
+                    'env': None,
                     'sudo': False,
                     'logging': True,
                     'user': getpass.getuser(),
