@@ -95,7 +95,7 @@ class Sultan(Base):
         context['sudo'] = sudo
         context['hostname'] = hostname
         context['ssh_config'] = str(ssh_config) if ssh_config else ''
-        context['env'] = env or {}
+        context['env'] = env or None # must be None, for Python to get the current process's env.
         context['logging'] = logging
         context['src'] = src
 
@@ -296,14 +296,17 @@ class Sultan(Base):
         # update with 'sudo' context
         sudo = context.get('sudo')
         user = context.get('user')
-        ssh_config = context.get('ssh_config')
-        hostname = context.get('hostname')
         if sudo:
             if user != getpass.getuser():
                 output = "sudo su - %s -c '%s'" % (user, output)
+            elif getpass.getuser() == 'root':
+                output = "su - %s -c '%s'" % (user, output)
             else:
                 output = "sudo %s" % (output)
 
+        # if we have to ssh, prepare for the SSH command
+        ssh_config = context.get('ssh_config')
+        hostname = context.get('hostname')
         if hostname:
             params = {
                 'user': user,

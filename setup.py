@@ -17,6 +17,7 @@ setup(
     packages=find_packages('src'),
     package_dir={'': 'src'},
     url='http://github.com/aeroxis/sultan',
+    install_requires=[],
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Environment :: Console",

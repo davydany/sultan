@@ -1,4 +1,7 @@
-# 0.6.0 (released September, 2017)
+# 0.6.4 (released September, 2017)
+- BUG FIXED: Fixed a bug where environment variable was being set to {} instead of None
+
+# 0.6.3 (released September, 2017)
 - Argh, I need to update the damn changelog
 - FEATURE: Added support for dashes '-' in commands like 'apt-get'
 - FEATURE: Added a Result object that contains STDOUT, STDERR and TRACEBACK.
