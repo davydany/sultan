@@ -190,7 +190,7 @@ class Sultan(Base):
             self._echo.cmd(commands)
 
         stdout, stderr = None, None
-        env = self._context[0].get('env', {}) if len(self._context) > 0 else {}
+        env = self._context[0].get('env', {}) if len(self._context) > 0 else os.environ
 
         try:
             stdout, stderr = subprocess.Popen(commands,
