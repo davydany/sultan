@@ -77,7 +77,8 @@ class Sultan(Base):
     @classmethod
     def load(cls, 
         cwd=None, sudo=False, user=None, 
-        hostname=None, env=None, logging=True, 
+        hostname=None, env=None, logging=True,
+        executable=None,
         ssh_config=None, src=None, 
         **kwargs):
 
@@ -90,6 +91,9 @@ class Sultan(Base):
         if src and not os.path.exists(src):
             raise IOError("The Source File provided (%s) does not exist" % src)
 
+        if executable and not os.path.exists(executable):
+            raise IOError("The set Executable (%s) does not exist" % src)
+
         context = {}
         context['cwd'] = cwd
         context['sudo'] = sudo
@@ -98,6 +102,7 @@ class Sultan(Base):
         context['env'] = env or None # must be None, for Python to get the current process's env.
         context['logging'] = logging
         context['src'] = src
+        context['executable'] = executable
 
         # determine user
         if user:
@@ -191,7 +196,7 @@ class Sultan(Base):
 
         stdout, stderr = None, None
         env = self._context[0].get('env', {}) if len(self._context) > 0 else os.environ
-
+        executable = self.current_context.get('executable')
         try:
             stdout, stderr = subprocess.Popen(commands,
                                               shell=True,
@@ -199,6 +204,7 @@ class Sultan(Base):
                                               stdin=subprocess.PIPE,
                                               stdout=subprocess.PIPE,
                                               stderr=subprocess.PIPE,
+                                              executable=executable,
                                               universal_newlines=True).communicate()
             result = Result(stdout, stderr)
 

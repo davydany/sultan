@@ -131,6 +131,7 @@ class SultanTestCase(unittest.TestCase):
         self.assertEqual(sultan.current_context, {
             'cwd': '/tmp',
             'env': None,
+            'executable': None,
             'sudo': False,
             'logging': True,
             'test_key': 'test_val',
@@ -144,7 +145,8 @@ class SultanTestCase(unittest.TestCase):
         with Sultan.load(cwd='/tmp') as sultan:
             self.assertEqual(sultan.current_context, {
                 'cwd': '/tmp', 
-                'env': None, 
+                'env': None,
+                'executable': None,
                 'sudo': False, 
                 'logging': True, 
                 'user': getpass.getuser(), 
@@ -157,7 +159,8 @@ class SultanTestCase(unittest.TestCase):
         with Sultan.load(cwd='/tmp', sudo=True) as sultan:
             self.assertEqual(sultan.current_context, {
                 'cwd': '/tmp', 
-                'env': None, 
+                'env': None,
+                'executable': None,
                 'sudo': True, 
                 'logging': True, 
                 'user': getpass.getuser(), 
@@ -169,7 +172,8 @@ class SultanTestCase(unittest.TestCase):
         with Sultan.load(cwd='/tmp', sudo=False, user="hodor") as sultan:
             self.assertEqual(sultan.current_context, {
                 'cwd': '/tmp', 
-                'env': None, 
+                'env': None,
+                'executable': None,
                 'sudo': False, 
                 'logging': True, 
                 'user': 'hodor', 
@@ -183,6 +187,7 @@ class SultanTestCase(unittest.TestCase):
             self.assertEqual(sultan.current_context, {
                 'cwd': None,
                 'env': None,
+                'executable': None,
                 'sudo': True, 
                 'logging': True, 
                 'user': getpass.getuser(), 
@@ -196,7 +201,8 @@ class SultanTestCase(unittest.TestCase):
             
             self.assertEqual(sultan.current_context, {
                 'cwd': None, 
-                'env': None, 
+                'env': None,
+                'executable': None,
                 'sudo': False, 
                 'logging': True, 
                 'user': getpass.getuser(), 
@@ -209,7 +215,8 @@ class SultanTestCase(unittest.TestCase):
         with Sultan.load(env={'path': ''}) as sultan:
             self.assertEqual(sultan.current_context, {
                 'cwd': None, 
-                'env': {'path': ''}, 
+                'env': {'path': ''},
+                'executable': None,
                 'sudo': False, 
                 'logging': True, 
                 'user': getpass.getuser(), 
@@ -224,6 +231,7 @@ class SultanTestCase(unittest.TestCase):
             self.assertEqual(sultan.current_context, {
                 'cwd': None,
                 'env': None,
+                'executable': None,
                 'sudo': False,
                 'logging': True,
                 'user': getpass.getuser(),
@@ -239,6 +247,7 @@ class SultanTestCase(unittest.TestCase):
                 self.assertEqual(s.current_context, {
                     'cwd': None,
                     'env': None,
+                    'executable': None,
                     'sudo': False,
                     'logging': True,
                     'user': getpass.getuser(),
@@ -250,6 +259,24 @@ class SultanTestCase(unittest.TestCase):
             if os.path.exists(filepath):
                 os.unlink(filepath)
 
+        # custom executable
+        filehandle, filepath = tempfile.mkstemp()
+        try:
+            with Sultan.load(executable=filepath) as s:
+                self.assertEqual(s.current_context, {
+                    'cwd': None,
+                    'env': None,
+                    'executable': filepath,
+                    'sudo': False,
+                    'logging': True,
+                    'user': getpass.getuser(),
+                    'hostname': None,
+                    'ssh_config': '',
+                    'src': None
+                })
+        finally:
+            if os.path.exists(filepath):
+                os.unlink(filepath)
 
     def test_context_for_pwd(self):
 
