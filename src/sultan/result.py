@@ -6,12 +6,13 @@ class Result(Base):
     Class that encompasses the result of a POpen command.
     """
 
-    def __init__(self, stdout, stderr, traceback=None):
+    def __init__(self, stdout, stderr, traceback=None, rc=None):
 
         super(Result, self).__init__()        
         self.__stdout = stdout
         self.__stderr = stderr
         self.__traceback = traceback
+        self.rc = rc
         self.__echo = Echo()
 
     def __str__(self):
