@@ -59,7 +59,7 @@ class SultanExecutable(unittest.TestCase):
 
     def test_nonexistent_executable(self):
         with self.assertRaises(IOError):
-            with Sultan.load(executable='/bin/sh') as sultan:
+            with Sultan.load(executable='no_such_exe_cause_sultan') as sultan:
                 sultan.ls().run()
 
 
