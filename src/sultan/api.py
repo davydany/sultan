@@ -193,14 +193,16 @@ class Sultan(Base):
         env = self._context[0].get('env', {}) if len(self._context) > 0 else os.environ
 
         try:
-            stdout, stderr = subprocess.Popen(commands,
-                                              shell=True,
-                                              env=env,
-                                              stdin=subprocess.PIPE,
-                                              stdout=subprocess.PIPE,
-                                              stderr=subprocess.PIPE,
-                                              universal_newlines=True).communicate()
-            result = Result(stdout, stderr)
+            process = subprocess.Popen(commands,
+                                       shell=True,
+                                       env=env,
+                                       stdin=subprocess.PIPE,
+                                       stdout=subprocess.PIPE,
+                                       stderr=subprocess.PIPE,
+                                       universal_newlines=True)
+
+            stdout, stderr = process.communicate()
+            result = Result(stdout, stderr, rc=process.returncode)
 
             if result.stdout:
                 return result 
