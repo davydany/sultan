@@ -185,6 +185,11 @@ class Sultan(Base):
             # call Command()
             return Command(self, name)
 
+    def exc(self, command, halt_on_nonzero=True, quiet=False, q=False):
+
+        self.commands = command.split(' ')
+        return self.run(halt_on_nonzero=halt_on_nonzero, quiet=quiet, q=q)
+
     def run(self, halt_on_nonzero=True, quiet=False, q=False):
         """
         After building your commands, call `run()` to have your code executed.
@@ -208,7 +213,11 @@ class Sultan(Base):
                                        universal_newlines=True)
 
             stdout, stderr = process.communicate()
-            result = Result(stdout, stderr, rc=process.returncode)
+            rc = process.returncode
+
+            result = Result(stdout, stderr, rc=rc)
+            return result
+
 
             if result.stdout:
                 return result 
