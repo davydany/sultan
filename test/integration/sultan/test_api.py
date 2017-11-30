@@ -39,6 +39,30 @@ class SultanEnvironment(unittest.TestCase):
             response = s.env().run()
             self.assertIn('FOOBAR=/tmp', response.stdout)
 
+
+class SultanExecutable(unittest.TestCase):
+    """
+    Tests for the executable being used
+    """
+
+    def test_default_executable(self):
+
+        with Sultan.load() as sultan:
+            result = sultan.ps().pipe().grep('`echo $$`').pipe().awk("'{ print $4 }'").run()
+            self.assertEqual(result.stdout[0], 'sh')
+
+    def test_custom_executable(self):
+
+        with Sultan.load(executable='/bin/bash') as sultan:
+            result = sultan.ps().pipe().grep('`echo $$`').pipe().awk("'{ print $4 }'").run()
+            self.assertEqual(result.stdout[0], 'bash')
+
+    def test_nonexistent_executable(self):
+        with self.assertRaises(IOError):
+            with Sultan.load(executable='no_such_exe_cause_sultan') as sultan:
+                sultan.ls().run()
+
+
 class SultanRunCustomScripts(unittest.TestCase):
     """
     Run a custom script that we create

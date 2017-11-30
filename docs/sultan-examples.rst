@@ -221,3 +221,26 @@ with Sultan.load() as s:
 Most times, you don't need to access the results of a command, but there are 
 times that you need to do so. For that, the **Result** object will be how you
 access it.
+
+Example 13: Custom Executable
+----------------------------------
+
+By default python's `subprocess <https://docs.python.org/3/library/subprocess.html#popen-constructor>`
+executes the program through **/bin/sh** on POSIX systems. In the rare circumstances
+when that's not desired, you can change it with the 'executable' argument while
+loading Sultan with Context.
+
+Here is an example::
+
+
+Here is an example that shows how to get the results of a command::
+
+    with Sultan.load(executable='/bin/bash') as sultan_bash:
+
+        result = sultan_bash.ps('-p', '$$', '-ocomm=')
+        assert result == 'bash'
+
+    with Sultan.load(executable='/bin/dash') as sultan_other:
+
+        result = sultan_other.ps('-p', '$$', '-ocomm=')
+        assert result == 'dash'
