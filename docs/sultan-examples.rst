@@ -202,8 +202,8 @@ Example 12: Results from a Command
 ----------------------------------
 
 When you run a command, your shell gives back results in stdout and stderr.
-Sultan returns a Result object which has **stdout**, **stderr** and 
-**traceback** object. 
+Sultan returns a Result object which has **stdout**, **stderr**,
+**traceback** and **rc** attributes.
 
 Here is an example that shows how to get the results of a command::
 
@@ -213,9 +213,10 @@ with Sultan.load() as s:
     result.stdout # the stdout
     result.stderr # the stderr
     result.traceback # the traceback
+    result.rc # the return code
 
 **stdout** and **stderr** returns a list, where each element is a line from 
-**stdout** and **stderr**.
+**stdout** and **stderr**; **rc** is an integer.
 
 Most times, you don't need to access the results of a command, but there are 
 times that you need to do so. For that, the **Result** object will be how you

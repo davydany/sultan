@@ -102,3 +102,19 @@ echo 'Donec sapien turpis, mattis vel urna sed, iaculis aliquam purus.\n' > $OUT
             self.assertEqual(response.stdout, ['Donec sapien turpis, mattis vel urna sed, iaculis aliquam purus.'])
         finally:
             shutil.rmtree(self.dir_path)
+
+
+class SultanReturnCode(unittest.TestCase):
+    """
+    Checks on the rc (return code).
+    """
+
+    def test_zero_rc(self):
+        with Sultan.load() as s:
+            response = s.ls().run()
+            self.assertEqual(response.rc, 0)
+
+    def test_non_zero_rc(self):
+        with Sultan.load() as s:
+            response = s.exit(22).run()
+            self.assertEqual(response.rc, 22)
