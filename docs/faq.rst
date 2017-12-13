@@ -14,7 +14,7 @@ Why use Sultan?
 Leverage the Power of Bash from Python
 **************************************
 
-Bash, while it seems arcaine, actually is quiet powerful! Creating a Tar Archive
+Bash, while it seems arcane, actually is quite powerful! Creating a Tar Archive
 of a directory requires us to read up on the tar API or check StackOverflow, but
 if you know how to do it in Bash, you'd be done before you finish reading the 
 StackOverflow post!
