@@ -9,7 +9,7 @@ install:
 - pip install -r requirements/test.txt
 - pip install -r docs/requirements.txt
 script:
-- make tests
+- make test
 - cd docs && make html
 - cd ..
 deploy:
