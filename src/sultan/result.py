@@ -9,6 +9,9 @@ class Result(Base):
 
     def __init__(self, stdout, stderr, traceback=None, rc=None):
 
+        if traceback == None:
+            traceback = ''
+
         super(Result, self).__init__()        
         self.__stdout = stdout
         self.__stderr = stderr

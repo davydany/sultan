@@ -218,15 +218,6 @@ class Sultan(Base):
             result = Result(stdout, stderr, rc=rc)
             return result
 
-
-            if result.stdout:
-                return result 
-
-            if result.stderr:
-                result.print_stderr()
-                
-            return result
-
         except Exception:
             tb = traceback.format_exc().split("\n")
 
