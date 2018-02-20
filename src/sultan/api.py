@@ -382,7 +382,8 @@ class Sultan(Base):
 
         def echo_debug_info(key):
 
-            self._echo.warn("\t - %s: %s" % (key, self._context[0].get(key, 'N/A')))
+            if self._context and len(self._context) > 0:
+                self._echo.warn("\t - %s: %s" % (key, self._context[0].get(key, 'N/A')))
 
         self._echo.warn("The following are additional information that can be used to debug this exception.")
         self._echo.warn("The following is the context used to run:")
@@ -395,8 +396,6 @@ class Sultan(Base):
         echo_debug_info('executable')
         echo_debug_info('ssh_config')
         echo_debug_info('src')
-        self._echo.warn("\t - CWD: %s" % self.context[0].get('cwd'))
-        self._echo.warn("\t - SUDO: %s" % self.context[0].get('sudo'))
 
 class BaseCommand(Base):
     """
