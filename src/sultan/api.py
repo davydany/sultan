@@ -235,6 +235,9 @@ class Sultan(Base):
             if result.stderr:
                 result.print_stderr()
 
+            # print debug information
+            self.__display_exception_debug_information()
+
             # halt on error if it is requested
             if self.settings.HALT_ON_ERROR:
                 if halt_on_nonzero:
@@ -374,6 +377,26 @@ class Sultan(Base):
     def stdin(self, message):
 
         return input(message)
+
+    def __display_exception_debug_information(self):
+
+        def echo_debug_info(key):
+
+            self._echo.warn("\t - %s: %s" % (key, self._context[0].get(key, 'N/A')))
+
+        self._echo.warn("The following are additional information that can be used to debug this exception.")
+        self._echo.warn("The following is the context used to run:")
+        echo_debug_info('cwd')
+        echo_debug_info('sudo')
+        echo_debug_info('user')
+        echo_debug_info('hostname')
+        echo_debug_info('env')
+        echo_debug_info('logging')
+        echo_debug_info('executable')
+        echo_debug_info('ssh_config')
+        echo_debug_info('src')
+        self._echo.warn("\t - CWD: %s" % self.context[0].get('cwd'))
+        self._echo.warn("\t - SUDO: %s" % self.context[0].get('sudo'))
 
 class BaseCommand(Base):
     """
