@@ -581,6 +581,10 @@ class SSHConfig(Config):
             'shorthand': '-i',
             'required': False
         },
+        'option': {
+            'shorthand': '-o',
+            'required': False
+        },
         'port': {
             'shorthand': '-p',
             'required': False
