@@ -49,13 +49,13 @@ class SultanExecutable(unittest.TestCase):
 
         with Sultan.load() as sultan:
             result = sultan.ps().pipe().grep('`echo $$`').pipe().awk("'{ print $4 }'").run()
-            self.assertEqual(result.stdout[0], 'sh')
+            self.assertEqual(result.stdout[0], '/bin/sh')
 
     def test_custom_executable(self):
 
         with Sultan.load(executable='/bin/bash') as sultan:
             result = sultan.ps().pipe().grep('`echo $$`').pipe().awk("'{ print $4 }'").run()
-            self.assertEqual(result.stdout[0], 'bash')
+            self.assertEqual(result.stdout[0], '/bin/bash')
 
     def test_nonexistent_executable(self):
         with self.assertRaises(IOError):
