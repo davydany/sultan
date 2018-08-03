@@ -138,7 +138,8 @@ class SultanTestCase(unittest.TestCase):
             'user': getpass.getuser(),
             'hostname': None,
             'ssh_config': '',
-            'src': None
+            'src': None,
+            'capture_output': True,
         })
 
         # cwd
@@ -152,7 +153,8 @@ class SultanTestCase(unittest.TestCase):
                 'user': getpass.getuser(), 
                 'hostname': None,
                 'ssh_config': '',
-                'src': None
+                'src': None,
+                'capture_output': True,
             })
 
         # sudo
@@ -166,7 +168,8 @@ class SultanTestCase(unittest.TestCase):
                 'user': getpass.getuser(), 
                 'hostname': None,
                 'ssh_config': '',
-                'src': None
+                'src': None,
+                'capture_output': True,
             })
 
         with Sultan.load(cwd='/tmp', sudo=False, user="hodor") as sultan:
@@ -179,7 +182,8 @@ class SultanTestCase(unittest.TestCase):
                 'user': 'hodor', 
                 'hostname': None,
                 'ssh_config': '',
-                'src': None
+                'src': None,
+                'capture_output': True,
             })
 
         with Sultan.load(sudo=True) as sultan:
@@ -193,7 +197,8 @@ class SultanTestCase(unittest.TestCase):
                 'user': getpass.getuser(), 
                 'hostname': None,
                 'ssh_config': '',
-                'src': None
+                'src': None,
+                'capture_output': True,
             })
 
         # hostname
@@ -208,7 +213,8 @@ class SultanTestCase(unittest.TestCase):
                 'user': getpass.getuser(), 
                 'hostname': 'localhost',
                 'ssh_config': '',
-                'src': None
+                'src': None,
+                'capture_output': True,
             })
 
         # set environment
@@ -222,9 +228,25 @@ class SultanTestCase(unittest.TestCase):
                 'user': getpass.getuser(), 
                 'hostname': None,
                 'ssh_config': '',
-                'src': None
+                'src': None,
+                'capture_output': True,
             })
 
+        # disable capture of stdout/stderr
+        with Sultan.load(capture_output=False) as sultan:
+            self.assertEqual(sultan.current_context, {
+                'cwd': None,
+                'env': None,
+                'executable': None,
+                'sudo': False,
+                'logging': True,
+                'user': getpass.getuser(),
+                'hostname': None,
+                'ssh_config': '',
+                'src': None,
+                'capture_output': False,
+            })
+            
         # set port
         config = SSHConfig(port=2222)
         with Sultan.load(ssh_config=config) as sultan:
@@ -237,7 +259,8 @@ class SultanTestCase(unittest.TestCase):
                 'user': getpass.getuser(),
                 'hostname': None,
                 'ssh_config': '-p 2222',
-                'src': None
+                'src': None,
+                'capture_output': True,
             })
 
         # set src
@@ -253,7 +276,8 @@ class SultanTestCase(unittest.TestCase):
                     'user': getpass.getuser(),
                     'hostname': None,
                     'ssh_config': '',
-                    'src': filepath
+                    'src': filepath,
+                    'capture_output': True,
                 })
         finally:
             if os.path.exists(filepath):
@@ -272,7 +296,8 @@ class SultanTestCase(unittest.TestCase):
                     'user': getpass.getuser(),
                     'hostname': None,
                     'ssh_config': '',
-                    'src': None
+                    'src': None,
+                    'capture_output': True,
                 })
         finally:
             if os.path.exists(filepath):

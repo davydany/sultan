@@ -79,7 +79,7 @@ class Sultan(Base):
         cwd=None, sudo=False, user=None, 
         hostname=None, env=None, logging=True,
         executable=None,
-        ssh_config=None, src=None, 
+        ssh_config=None, src=None, capture_output=True,
         **kwargs):
 
         # initial checks
@@ -103,6 +103,7 @@ class Sultan(Base):
         context['logging'] = logging
         context['src'] = src
         context['executable'] = executable
+        context['capture_output'] = capture_output
 
         # determine user
         if user:
@@ -114,7 +115,6 @@ class Sultan(Base):
         return cls(context=context)
 
     def __init__(self, context=None):
-
         self.commands = []
         self._context = [context] if context is not None else []
         self.logging_activated = context.get('logging') if context else False
@@ -202,13 +202,14 @@ class Sultan(Base):
         stdout, stderr = None, None
         env = self._context[0].get('env', {}) if len(self._context) > 0 else os.environ
         executable = self.current_context.get('executable')
+        capture_output = self._context[0]['capture_output'] if len(self._context) > 0 else True 
         try:
             process = subprocess.Popen(commands,
                                        shell=True,
                                        env=env,
                                        stdin=subprocess.PIPE,
-                                       stdout=subprocess.PIPE,
-                                       stderr=subprocess.PIPE,
+                                       stdout=subprocess.PIPE if capture_output else None,
+                                       stderr=subprocess.PIPE if capture_output else None,
                                        executable=executable,
                                        universal_newlines=True)
 
@@ -396,6 +397,7 @@ class Sultan(Base):
         echo_debug_info('executable')
         echo_debug_info('ssh_config')
         echo_debug_info('src')
+        echo_debug_info('capture_output')
 
 class BaseCommand(Base):
     """
