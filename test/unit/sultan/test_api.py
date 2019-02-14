@@ -56,9 +56,9 @@ class SultanTestCase(unittest.TestCase):
     def test_run_halt_on_nonzero(self, m_subprocess):
 
         m_subprocess = mock.Mock()
-        m_subprocess.Popen.side_effect = subprocess.OSError(1, "foobar")
+        m_subprocess.Popen.side_effect = OSError(1, "foobar")
         s = Sultan()
-        with self.assertRaises(subprocess.OSError):
+        with self.assertRaises(OSError):
             s.foobar("-qux").run()
 
         try:
