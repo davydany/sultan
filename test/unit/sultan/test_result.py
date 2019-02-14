@@ -1,3 +1,4 @@
+import mock
 import unittest
 
 from sultan.result import Result
