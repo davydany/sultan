@@ -26,16 +26,16 @@ ls: /foobar: No such file or directory
 ls: /root: No such file or directory
         '''
 
-    @mock.patch("sultan.result.process")
-    def test_stdout(self, m_process):
-        m_process.communicate.return_value = (self.stdout, self.stderr)
-        m_process.rc.return_value = 0
-        result = Result(m_process, [], {})
+    @mock.patch("sultan.result.subprocess")
+    def test_stdout(self, m_subprocess):
+        m_subprocess.Popen = mock.Mock()
+        m_subprocess.Popen().communicate.return_value = (self.stdout, self.stderr)
+        result = Result(m_subprocess, [], {})
         self.assertEqual(result.stdout, self.stdout.strip().splitlines())
 
-    @mock.patch("sultan.result.process")
-    def test_stderr(self, m_process):
-        m_process.communicate.return_value = (self.stdout, self.stderr)
-        m_process.rc.return_value = 0
-        result = Result(m_process, [], {})
+    @mock.patch("sultan.result.subprocess")
+    def test_stderr(self, m_subprocess):
+        m_subprocess.Popen = mock.Mock()
+        m_subprocess.Popen().communicate.return_value = (self.stdout, self.stderr)
+        result = Result(m_subprocess, [], {})
         self.assertEqual(result.stderr, self.stderr.strip().splitlines())
