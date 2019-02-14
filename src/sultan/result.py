@@ -52,7 +52,7 @@ class Result(Base):
             try:
                 stdout, stderr = process.communicate()
             except:
-                pass
+                stdout, stderr = None, None
                 
             try:
                 self.rc = process.returncode
