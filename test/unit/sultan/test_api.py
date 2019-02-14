@@ -55,7 +55,7 @@ class SultanTestCase(unittest.TestCase):
     @mock.patch('sultan.api.subprocess')
     def test_run_halt_on_nonzero(self, m_subprocess):
 
-        m_subprocess = mock.Mock()
+        #m_subprocess = mock.Mock()
         m_subprocess.Popen.side_effect = OSError(1, "foobar")
         s = Sultan()
         with self.assertRaises(OSError):
