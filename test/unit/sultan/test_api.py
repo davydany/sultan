@@ -2,7 +2,6 @@ import logging
 import mock
 import os
 import shutil
-import subprocess
 import tempfile
 import unittest
 import getpass
@@ -55,7 +54,6 @@ class SultanTestCase(unittest.TestCase):
     @mock.patch('sultan.api.subprocess')
     def test_run_halt_on_nonzero(self, m_subprocess):
 
-        #m_subprocess = mock.Mock()
         m_subprocess.Popen.side_effect = OSError(1, "foobar")
         s = Sultan()
         with self.assertRaises(OSError):
@@ -63,7 +61,7 @@ class SultanTestCase(unittest.TestCase):
 
         try:
             s.foobar("-qux").run(halt_on_nonzero=False)
-        except Exception as e:
+        except Exception:
             self.fail(
                 "s.foobar('-qux').run(halt_on_nonzero=False) should not raise any errors.")
 
