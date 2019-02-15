@@ -1,7 +1,7 @@
 import subprocess
 import sys
 
-from Queue import Queue
+from queue import Queue
 from sultan.core import Base
 from sultan.echo import Echo
 from threading import Thread
