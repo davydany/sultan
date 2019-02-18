@@ -1,5 +1,5 @@
-import subprocess
 import sys
+import time
 
 from queue import Queue
 from sultan.core import Base
@@ -9,13 +9,19 @@ from threading import Thread
 
 def read_output(pipe, q):
     for line in iter(pipe.readline, b''):
-        q.put(line.strip())
+        if line:
+            q.put(line.strip())
+        else:
+            time.sleep(0.1)
     pipe.close()
 
 
 def write_input(pipe, q):
     for line in iter(q.get, None):
-        pipe.write(line)
+        if line.endswith("\n"):
+            pipe.write(line)
+        else:
+            pipe.write(line + "\n")
     
 
 class Result(Base):
@@ -139,6 +145,13 @@ class Result(Base):
         else:
             stderr = self.__stderr
         return stderr
+
+    def stdin(self, line):
+        """
+        Sends input to stdin.
+        """
+        if self._streaming:
+            self.__stdin.put(line)
 
     @property
     def traceback(self):

@@ -1,4 +1,5 @@
 import mock
+import subprocess
 import unittest
 
 from sultan.result import Result
