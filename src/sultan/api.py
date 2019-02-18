@@ -55,7 +55,6 @@ import getpass
 import os
 import subprocess
 import sys
-import traceback
 
 from .core import Base
 from .config import Settings
@@ -210,28 +209,13 @@ class Sultan(Base):
                                        stderr=subprocess.PIPE,
                                        executable=executable,
                                        universal_newlines=True)
-            result = Result(process, commands, self._context, streaming)
+            result = Result(process, commands, self._context, streaming, halt_on_nonzero=halt_on_nonzero)
 
-        except Exception:
-            tb = traceback.format_exc().split("\n")
-            self._echo.critical("Unable to run '%s'" % commands)
-            result = Result(None, commands, self._context, traceback=tb)
-
-            #  traceback
-            result.print_traceback()
-
-            # print debug information
-            self.__display_exception_debug_information()
-
-            # halt on error if it is requested
-            if self.settings.HALT_ON_ERROR:
-                if halt_on_nonzero:
-                    raise
-
+        except Exception as e:
+            result = Result(None, commands, self._context, exception=e)
+            result.dump_exception()
             if halt_on_nonzero:
-                raise
-
-            return result
+                raise e
         
         return result
 

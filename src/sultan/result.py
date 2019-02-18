@@ -1,6 +1,7 @@
 import subprocess
 import sys
 import time
+import traceback
 
 from queue import Queue
 from sultan.core import Base
@@ -8,37 +9,21 @@ from sultan.echo import Echo
 from threading import Thread
 
 
-def read_output(pipe, q):
-    for line in iter(pipe.readline, b''):
-        if line:
-            q.put(line.strip())
-        else:
-            time.sleep(0.1)
-    pipe.close()
-
-
-def write_input(pipe, q):
-    for line in iter(q.get, None):
-        if line.endswith("\n"):
-            pipe.write(line)
-        else:
-            pipe.write(line + "\n")
-    
-
 class Result(Base):
     """
     Class that encompasses the result of a POpen command.
     """
 
-    def __init__(self, process, commands, context, streaming=False, traceback=''):
+    def __init__(self, process, commands, context, streaming=False, exception=None, halt_on_nonzero=False):
         super(Result, self).__init__()
         self._process = process
         self._commands = commands
         self._context = context
-        self.__traceback = traceback
+        self._exception = exception
         self.__echo = Echo()
         self._streaming = streaming
         self.rc = None
+        self._halt_on_nonzero=halt_on_nonzero
         
         if process and streaming:
             self.is_complete = False
@@ -46,9 +31,9 @@ class Result(Base):
             self.__stderr = Queue()
             self.__stdin = Queue()
 
-            self._stdout_t = Thread(target=read_output, args=(process.stdout, self.__stdout))
-            self._stderr_t = Thread(target=read_output, args=(process.stderr, self.__stderr))
-            self._stdin_t = Thread(target=write_input, args=(process.stdin, self.__stdin))
+            self._stdout_t = Thread(target=self.read_output, args=(process.stdout, self.__stdout))
+            self._stderr_t = Thread(target=self.read_output, args=(process.stderr, self.__stderr))
+            self._stdin_t = Thread(target=self.write_input)
             self._wait_t = Thread(target=self.wait_on_process)
 
             for t in (self._stdout_t, self._stderr_t, self._stdin_t, self._wait_t):
@@ -66,9 +51,32 @@ class Result(Base):
                 self.rc = process.returncode
             except:
                 pass
-                
+            
             self.__stdout = stdout.strip().splitlines() if stdout else []
             self.__stderr = stderr.strip().splitlines() if stderr else []
+            
+            if self._halt_on_nonzero and self.rc != 0:
+                self.dump_exception()
+
+
+    def read_output(self, pipe, q):
+        for line in iter(pipe.readline, b''):
+            if line:
+                q.put(line.strip())
+            elif self.is_complete:
+                break
+            else:
+                time.sleep(0.1)
+        pipe.close()
+
+
+    def write_input(self):
+        for line in iter(self.__stdin.get, None):
+            if line.endswith("\n"):
+                self._process.stdin.write(line)
+            else:
+                self._process.stdin.write(line + "\n")
+
 
     def wait_on_process(self):
         self.rc = self._process.wait()
@@ -76,7 +84,34 @@ class Result(Base):
         self.is_complete = True
         for t in (self._stdout_t, self._stderr_t, self._stdin_t):
             t.join()
+        if self._halt_on_nonzero and self.rc != 0:
+            self.dump_exception()
         sys.exit()
+        
+                
+    def dump_exception(self):
+        if not self._exception:
+            try:
+                raise subprocess.CalledProcessError(self.rc, ''.join(self._commands), self.stderr)
+            except subprocess.CalledProcessError as e:
+                self._exception = e
+
+        self.__echo.critical("Unable to run '%s'" % self._commands)
+
+        #  traceback
+        self.print_traceback()
+
+        # standard out
+        self.print_stdout()
+
+        # standard error
+        self.print_stderr()
+
+        # print debug information
+        self.__display_exception_debug_information()
+
+        if self._halt_on_nonzero:
+            raise self._exception
                 
     def __display_exception_debug_information(self):
 
@@ -159,7 +194,10 @@ class Result(Base):
         """
         Converts traceback string to a list.
         """
-        return self.__traceback
+        if self._exception:
+            return traceback.format_exc(self._exception).split("\n")
+        else:
+            return []
 
     @property
     def is_success(self):
@@ -180,9 +218,9 @@ class Result(Base):
     @property
     def has_exception(self):
         '''
-        Returns True if self.__traceback is not empty.
+        Returns True if self._exception is not empty.
         '''
-        return bool(self.__traceback)
+        return bool(self._exception)
 
     def print_stdout(self, always_print=False):
         """
@@ -209,7 +247,7 @@ class Result(Base):
         Prints the traceback to console - if there is any traceback, otherwise does nothing.
         :param always_print:   print the traceback, even if there is nothing in the buffer (default: false)
         """
-        if self.__traceback or always_print:
+        if self._exception or always_print:
             self.__echo.critical("--{ TRACEBACK }" + "-" * 100)
             self.__format_lines_error(self.traceback)
             self.__echo.critical("---------------" + "-" * 100)
