@@ -207,13 +207,13 @@ Sultan returns a Result object which has **stdout**, **stderr**,
 
 Here is an example that shows how to get the results of a command::
 
-with Sultan.load() as s:
+    with Sultan.load() as s:
 
-    result = s.yum('install', '-y', 'postgresql')
-    result.stdout # the stdout
-    result.stderr # the stderr
-    result.traceback # the traceback
-    result.rc # the return code
+        result = s.yum('install', '-y', 'postgresql')
+        result.stdout # the stdout
+        result.stderr # the stderr
+        result.traceback # the traceback
+        result.rc # the return code
 
 **stdout** and **stderr** returns a list, where each element is a line from 
 **stdout** and **stderr**; **rc** is an integer.
