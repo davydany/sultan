@@ -1,4 +1,3 @@
-import logging
 import mock
 import os
 import shutil
@@ -27,9 +26,9 @@ class SultanTestCase(unittest.TestCase):
 
     @mock.patch("sultan.api.subprocess")
     def test_run_basic(self, m_subprocess):
-
         m_subprocess.Popen = mock.Mock()
         m_subprocess.Popen().communicate.return_value = ("sample_response", "")
+        m_subprocess.Popen().returncode = 0
         sultan = Sultan()
         response = sultan.ls("-lah /tmp").run()
         self.assertTrue(m_subprocess.Popen().communicate.called)
@@ -346,7 +345,7 @@ class SultanTestCase(unittest.TestCase):
 
         s = Sultan()
         try:
-            s.ls("/root").run()
+            s.ls("/root").run(halt_on_nonzero=False)
         except:
             self.assertEqual(len(s.commands), 0)
 

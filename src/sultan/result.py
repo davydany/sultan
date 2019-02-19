@@ -195,7 +195,7 @@ class Result(Base):
         Converts traceback string to a list.
         """
         if self._exception:
-            return traceback.format_exc(self._exception).split("\n")
+            return traceback.format_exc().split("\n")
         else:
             return []
 
