@@ -1,8 +1,6 @@
-import logging
 import mock
 import os
 import shutil
-import subprocess
 import tempfile
 import unittest
 import getpass
@@ -28,9 +26,9 @@ class SultanTestCase(unittest.TestCase):
 
     @mock.patch("sultan.api.subprocess")
     def test_run_basic(self, m_subprocess):
-
         m_subprocess.Popen = mock.Mock()
         m_subprocess.Popen().communicate.return_value = ("sample_response", "")
+        m_subprocess.Popen().returncode = 0
         sultan = Sultan()
         response = sultan.ls("-lah /tmp").run()
         self.assertTrue(m_subprocess.Popen().communicate.called)
@@ -55,15 +53,14 @@ class SultanTestCase(unittest.TestCase):
     @mock.patch('sultan.api.subprocess')
     def test_run_halt_on_nonzero(self, m_subprocess):
 
-        m_subprocess.Popen = mock.Mock()
-        m_subprocess.Popen().communicate.side_effect = subprocess.CalledProcessError(1, "foobar")
+        m_subprocess.Popen.side_effect = OSError(1, "foobar")
         s = Sultan()
-        with self.assertRaises(subprocess.CalledProcessError):
+        with self.assertRaises(OSError):
             s.foobar("-qux").run()
 
         try:
             s.foobar("-qux").run(halt_on_nonzero=False)
-        except Exception as e:
+        except Exception:
             self.fail(
                 "s.foobar('-qux').run(halt_on_nonzero=False) should not raise any errors.")
 
@@ -348,7 +345,7 @@ class SultanTestCase(unittest.TestCase):
 
         s = Sultan()
         try:
-            s.ls("/root").run()
+            s.ls("/root").run(halt_on_nonzero=False)
         except:
             self.assertEqual(len(s.commands), 0)
 

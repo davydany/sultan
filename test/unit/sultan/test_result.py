@@ -1,3 +1,4 @@
+import mock
 import unittest
 
 from sultan.result import Result
@@ -25,13 +26,16 @@ ls: /foobar: No such file or directory
 ls: /root: No such file or directory
         '''
 
-
-    def test_stdout(self):
-
-        result = Result(self.stdout, self.stderr)
+    @mock.patch("sultan.result.subprocess")
+    def test_stdout(self, m_subprocess):
+        m_subprocess.Popen = mock.Mock()
+        m_subprocess.Popen().communicate.return_value = (self.stdout, self.stderr)
+        result = Result(m_subprocess.Popen(), [], {})
         self.assertEqual(result.stdout, self.stdout.strip().splitlines())
 
-    def test_stderr(self):
-
-        result = Result(self.stdout, self.stderr)
+    @mock.patch("sultan.result.subprocess")
+    def test_stderr(self, m_subprocess):
+        m_subprocess.Popen = mock.Mock()
+        m_subprocess.Popen().communicate.return_value = (self.stdout, self.stderr)
+        result = Result(m_subprocess.Popen(), [], {})
         self.assertEqual(result.stderr, self.stderr.strip().splitlines())

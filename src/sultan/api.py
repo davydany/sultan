@@ -54,7 +54,6 @@ If you have more questions, check the docs! http://sultan.readthedocs.io/en/late
 import getpass
 import os
 import subprocess
-import traceback
 import sys
 
 from .core import Base
@@ -185,25 +184,24 @@ class Sultan(Base):
             # call Command()
             return Command(self, name)
 
-    def exc(self, command, halt_on_nonzero=True, quiet=False, q=False):
+    def exc(self, command, halt_on_nonzero=True, quiet=False, q=False, streaming=False):
 
         self.commands = command.split(' ')
-        return self.run(halt_on_nonzero=halt_on_nonzero, quiet=quiet, q=q)
+        return self.run(halt_on_nonzero=halt_on_nonzero, quiet=quiet, q=q, streaming=streaming)
 
-    def run(self, halt_on_nonzero=True, quiet=False, q=False):
+    def run(self, halt_on_nonzero=True, quiet=False, q=False, streaming=False):
         """
         After building your commands, call `run()` to have your code executed.
         """
-
         commands = str(self)
         if not (quiet or q):
             self._echo.cmd(commands)
 
-        stdout, stderr = None, None
         env = self._context[0].get('env', {}) if len(self._context) > 0 else os.environ
         executable = self.current_context.get('executable')
         try:
             process = subprocess.Popen(commands,
+                                       bufsize=1,
                                        shell=True,
                                        env=env,
                                        stdin=subprocess.PIPE,
@@ -211,47 +209,15 @@ class Sultan(Base):
                                        stderr=subprocess.PIPE,
                                        executable=executable,
                                        universal_newlines=True)
+            result = Result(process, commands, self._context, streaming, halt_on_nonzero=halt_on_nonzero)
 
-            stdout, stderr = process.communicate()
-            rc = process.returncode
-
-            result = Result(stdout, stderr, rc=rc)
-            return result
-
-        except Exception:
-            tb = traceback.format_exc().split("\n")
-
-            self._echo.critical("Unable to run '%s'" % commands)
-            result = Result(stdout, stderr, traceback=tb)
-
-            #  traceback
-            result.print_traceback()
-
-            # standard out
-            if result.stdout:
-                result.print_stdout()
-
-            # standard error
-            if result.stderr:
-                result.print_stderr()
-
-            # print debug information
-            self.__display_exception_debug_information()
-
-            # halt on error if it is requested
-            if self.settings.HALT_ON_ERROR:
-                if halt_on_nonzero:
-                    raise
-
+        except Exception as e:
+            result = Result(None, commands, self._context, exception=e)
+            result.dump_exception()
             if halt_on_nonzero:
-                raise
-
-            return result
-
-        finally:
-
-            # clear the buffer
-            self.clear()
+                raise e
+        
+        return result
 
     def _add(self, command):
         """
@@ -377,25 +343,7 @@ class Sultan(Base):
     def stdin(self, message):
 
         return input(message)
-
-    def __display_exception_debug_information(self):
-
-        def echo_debug_info(key):
-
-            if self._context and len(self._context) > 0:
-                self._echo.warn("\t - %s: %s" % (key, self._context[0].get(key, 'N/A')))
-
-        self._echo.warn("The following are additional information that can be used to debug this exception.")
-        self._echo.warn("The following is the context used to run:")
-        echo_debug_info('cwd')
-        echo_debug_info('sudo')
-        echo_debug_info('user')
-        echo_debug_info('hostname')
-        echo_debug_info('env')
-        echo_debug_info('logging')
-        echo_debug_info('executable')
-        echo_debug_info('ssh_config')
-        echo_debug_info('src')
+    
 
 class BaseCommand(Base):
     """
@@ -450,8 +398,6 @@ class Command(BaseCommand):
         args_str = (" ".join(self.args)).strip()
         kwargs_list = []
         for k, v in self.kwargs.items():
-
-            key = None
             value = v
             if len(k) == 1:
                 key = "-%s" % k
@@ -514,8 +460,6 @@ class Redirect(BaseCommand):
     Representation of the Redirect (`>`, `>>`, ...) operator.
     """
     def __call__(self, to_file, append=False, stdout=False, stderr=False):
-
-        descriptor = None
         if stdout and stderr:
             descriptor = "&"
         else:
@@ -579,10 +523,6 @@ class SSHConfig(Config):
     params_map = {
         'identity_file': {
             'shorthand': '-i',
-            'required': False
-        },
-        'option': {
-            'shorthand': '-o',
             'required': False
         },
         'port': {

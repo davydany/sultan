@@ -208,8 +208,7 @@ Sultan returns a Result object which has **stdout**, **stderr**,
 Here is an example that shows how to get the results of a command::
 
     with Sultan.load() as s:
-
-        result = s.yum('install', '-y', 'postgresql')
+        result = s.yum('install', '-y', 'postgresql').run()
         result.stdout # the stdout
         result.stderr # the stderr
         result.traceback # the traceback
@@ -222,7 +221,26 @@ Most times, you don't need to access the results of a command, but there are
 times that you need to do so. For that, the **Result** object will be how you
 access it.
 
-Example 13: Custom Executable
+Example 13: Streaming Results from a Command
+----------------------------------
+
+Here is an example that shows how to get real-time output from a command::
+
+    with Sultan.load() as s:
+        result = s.yum('install', '-y', 'postgresql').run(streaming=True)
+        while True:
+            # if full output is needed, read the pipes one last time
+            # after `is_complete == True` to avoid a race condition
+            complete = result.is_complete
+            for line in result.stdout:
+                print(line)
+            for line in result.stderr:
+                print(line)
+            if complete:
+                break
+            time.sleep(1)
+
+Example 14: Custom Executable
 ----------------------------------
 
 By default python's `subprocess <https://docs.python.org/3/library/subprocess.html#popen-constructor>`

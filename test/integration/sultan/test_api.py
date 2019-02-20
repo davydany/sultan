@@ -116,5 +116,5 @@ class SultanReturnCode(unittest.TestCase):
 
     def test_non_zero_rc(self):
         with Sultan.load() as s:
-            response = s.exit(22).run()
+            response = s.exit(22).run(halt_on_nonzero=False)
             self.assertEqual(response.rc, 22)
