@@ -216,6 +216,9 @@ class Sultan(Base):
             result.dump_exception()
             if halt_on_nonzero:
                 raise e
+                
+        finally:
+            self.clear()
         
         return result
 
