@@ -470,3 +470,11 @@ class TestRedirect(unittest.TestCase):
         r = Redirect(s, '')
         r("/tmp/foo", stdout=True, stderr=True, append=True)
         self.assertEqual(r.command, "&>> /tmp/foo")
+
+    def test_clear_buffer_after_run(self):
+        
+        s = Sultan()
+        first = s.echo("first").run().stdout
+        second = s.echo("second").run().stdout
+        self.assertEqual(first, ['first'])
+        self.assertEqual(second, ['second'])
