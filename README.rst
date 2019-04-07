@@ -1,3 +1,5 @@
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Faeroxis%2Fsultan.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Faeroxis%2Fsultan?ref=badge_shield)
+
 .. image:: https://raw.githubusercontent.com/aeroxis/sultan/master/docs/img/sultan-logo.png
   :alt: sultan logo
   :align: right
@@ -136,3 +138,6 @@ Want to get started? Simply install Sultan, and start writing your clean code::
     pip install --upgrade sultan
 
 If you have more questions, check the docs! http://sultan.readthedocs.io/en/latest/
+
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Faeroxis%2Fsultan.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Faeroxis%2Fsultan?ref=badge_large)
