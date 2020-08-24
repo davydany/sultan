@@ -532,4 +532,8 @@ class SSHConfig(Config):
             'shorthand': '-p',
             'required': False
         },
+        'option': {
+            'shorthand': '-o',
+            'required': False
+        },
     }
