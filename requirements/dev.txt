@@ -1,3 +1,4 @@
 ipython==5.1.0
 ipython-genutils==0.1.0
 ipdb==0.10.1
+prompt-toolkit>=3.0.13 # not directly required, pinned by Snyk to avoid a vulnerability
